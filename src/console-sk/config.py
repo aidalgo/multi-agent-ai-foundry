@@ -1,4 +1,8 @@
-# app_config.py
+"""
+Application configuration for the console multi-agent system.
+Simplified version of backend/app_config.py
+"""
+
 import logging
 import os
 from typing import Optional
@@ -23,7 +27,7 @@ class AppConfig:
         self.AZURE_CLIENT_ID = self._get_optional("AZURE_CLIENT_ID")
         self.AZURE_CLIENT_SECRET = self._get_optional("AZURE_CLIENT_SECRET")
 
-        # CosmosDB settings
+        # CosmosDB settings (optional for console app)
         self.COSMOSDB_ENDPOINT = self._get_optional("COSMOSDB_ENDPOINT")
         self.COSMOSDB_DATABASE = self._get_optional("COSMOSDB_DATABASE")
         self.COSMOSDB_CONTAINER = self._get_optional("COSMOSDB_CONTAINER")
@@ -40,7 +44,7 @@ class AppConfig:
             f"{self._get_optional('AZURE_OPENAI_SCOPE', 'https://cognitiveservices.azure.com/.default')}"
         ]
 
-        # Frontend settings
+        # Frontend settings (not used in console)
         self.FRONTEND_SITE_NAME = self._get_optional(
             "FRONTEND_SITE_NAME", "http://127.0.0.1:3000"
         )
@@ -58,18 +62,7 @@ class AppConfig:
         self._ai_project_client = None
 
     def _get_required(self, name: str, default: Optional[str] = None) -> str:
-        """Get a required configuration value from environment variables.
-
-        Args:
-            name: The name of the environment variable
-            default: Optional default value if not found
-
-        Returns:
-            The value of the environment variable or default if provided
-
-        Raises:
-            ValueError: If the environment variable is not found and no default is provided
-        """
+        """Get a required configuration value from environment variables."""
         if name in os.environ:
             return os.environ[name]
         if default is not None:
@@ -82,37 +75,17 @@ class AppConfig:
         )
 
     def _get_optional(self, name: str, default: str = "") -> str:
-        """Get an optional configuration value from environment variables.
-
-        Args:
-            name: The name of the environment variable
-            default: Default value if not found (default: "")
-
-        Returns:
-            The value of the environment variable or the default value
-        """
+        """Get an optional configuration value from environment variables."""
         if name in os.environ:
             return os.environ[name]
         return default
 
     def _get_bool(self, name: str) -> bool:
-        """Get a boolean configuration value from environment variables.
-
-        Args:
-            name: The name of the environment variable
-
-        Returns:
-            True if the environment variable exists and is set to 'true' or '1', False otherwise
-        """
+        """Get a boolean configuration value from environment variables."""
         return name in os.environ and os.environ[name].lower() in ["true", "1"]
 
     def get_azure_credentials(self):
-        """Get Azure credentials using DefaultAzureCredential.
-
-        Returns:
-            DefaultAzureCredential instance for Azure authentication
-        """
-        # Cache the credentials object
+        """Get Azure credentials using DefaultAzureCredential."""
         if self._azure_credentials is not None:
             return self._azure_credentials
 
@@ -124,11 +97,7 @@ class AppConfig:
             return None
 
     def get_cosmos_database_client(self):
-        """Get a Cosmos DB client for the configured database.
-
-        Returns:
-            A Cosmos DB database client
-        """
+        """Get a Cosmos DB client for the configured database."""
         try:
             if self._cosmos_client is None:
                 self._cosmos_client = CosmosClient(
@@ -149,22 +118,12 @@ class AppConfig:
             raise
 
     def create_kernel(self):
-        """Creates a new Semantic Kernel instance.
-
-        Returns:
-            A new Semantic Kernel instance
-        """
-        # Create a new kernel instance without manually configuring OpenAI services
-        # The agents will be created using Azure AI Agent Project pattern instead
+        """Creates a new Semantic Kernel instance."""
         kernel = Kernel()
         return kernel
 
     def get_ai_project_client(self):
-        """Create and return an AIProjectClient for Azure AI Foundry using from_connection_string.
-
-        Returns:
-            An AIProjectClient instance
-        """
+        """Create and return an AIProjectClient for Azure AI Foundry."""
         if self._ai_project_client is not None:
             return self._ai_project_client
 

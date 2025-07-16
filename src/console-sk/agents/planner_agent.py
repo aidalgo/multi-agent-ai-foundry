@@ -5,16 +5,15 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from azure.ai.agents.models import (ResponseFormatJsonSchema,
                                     ResponseFormatJsonSchemaType)
-from context.cosmos_memory_kernel import CosmosMemoryContext
-from event_utils import track_event_if_configured
-from kernel_agents.agent_base import BaseAgent
-from kernel_tools.generic_tools import GenericTools
-from kernel_tools.hr_tools import HrTools
-from kernel_tools.marketing_tools import MarketingTools
-from kernel_tools.procurement_tools import ProcurementTools
-from kernel_tools.product_tools import ProductTools
-from kernel_tools.tech_support_tools import TechSupportTools
-from models.messages_kernel import (
+from memory import ConsoleMemoryContext
+from agents.base_agent import BaseAgent
+from tools.generic_tools import GenericTools
+from tools.hr_tools import HrTools
+from tools.marketing_tools import MarketingTools
+from tools.procurement_tools import ProcurementTools
+from tools.product_tools import ProductTools
+from tools.tech_support_tools import TechSupportTools
+from models import (
     AgentMessage,
     AgentType,
     HumanFeedbackStatus,
@@ -28,7 +27,6 @@ from models.messages_kernel import (
 from semantic_kernel.functions import KernelFunction
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 
-
 class PlannerAgent(BaseAgent):
     """Planner agent implementation using Semantic Kernel.
 
@@ -40,7 +38,7 @@ class PlannerAgent(BaseAgent):
         self,
         session_id: str,
         user_id: str,
-        memory_store: CosmosMemoryContext,
+        memory_store: ConsoleMemoryContext,
         tools: Optional[List[KernelFunction]] = None,
         system_message: Optional[str] = None,
         agent_name: str = AgentType.PLANNER.value,
@@ -201,16 +199,7 @@ class PlannerAgent(BaseAgent):
                 )
             )
 
-            track_event_if_configured(
-                f"Planner - Generated a plan with {len(steps)} steps and added plan into the cosmos",
-                {
-                    "session_id": input_task.session_id,
-                    "user_id": self._user_id,
-                    "plan_id": plan.id,
-                    "content": f"Generated a plan with {len(steps)} steps. Click the checkmark beside each step to complete it, click the x to reject this step.",
-                    "source": AgentType.PLANNER.value,
-                },
-            )
+            return plan.model_dump_json()
 
             # If human clarification is needed, add a message requesting it
             if (
@@ -226,17 +215,6 @@ class PlannerAgent(BaseAgent):
                         source=AgentType.PLANNER.value,
                         step_id="",
                     )
-                )
-
-                track_event_if_configured(
-                    "Planner - Additional information requested and added into the cosmos",
-                    {
-                        "session_id": input_task.session_id,
-                        "user_id": self._user_id,
-                        "plan_id": plan.id,
-                        "content": f"I require additional information before we can proceed: {plan.human_clarification_request}",
-                        "source": AgentType.PLANNER.value,
-                    },
                 )
 
         return f"Plan '{plan.id}' created successfully with {len(steps)} steps"
@@ -273,16 +251,6 @@ class PlannerAgent(BaseAgent):
             )
         )
 
-        track_event_if_configured(
-            "Planner - Store HumanAgent clarification and added into the cosmos",
-            {
-                "session_id": session_id,
-                "user_id": self._user_id,
-                "content": f"{human_clarification}",
-                "source": AgentType.HUMAN.value,
-            },
-        )
-
         # Add a confirmation message
         await self._memory_store.add_item(
             AgentMessage(
@@ -293,16 +261,6 @@ class PlannerAgent(BaseAgent):
                 source=AgentType.PLANNER.value,
                 step_id="",
             )
-        )
-
-        track_event_if_configured(
-            "Planner - Updated with HumanClarification and added into the cosmos",
-            {
-                "session_id": session_id,
-                "user_id": self._user_id,
-                "content": "Thanks. The plan has been updated.",
-                "source": AgentType.PLANNER.value,
-            },
         )
 
         return "Plan updated with human clarification"
@@ -421,23 +379,6 @@ class PlannerAgent(BaseAgent):
                 await self._memory_store.add_step(step)
                 steps.append(step)
 
-                try:
-                    track_event_if_configured(
-                        "Planner - Added planned individual step into the cosmos",
-                        {
-                            "plan_id": plan.id,
-                            "action": action,
-                            "agent": agent_name,
-                            "status": StepStatus.planned,
-                            "session_id": input_task.session_id,
-                            "user_id": self._user_id,
-                            "human_approval_status": HumanFeedbackStatus.requested,
-                        },
-                    )
-                except Exception as event_error:
-                    # Don't let event tracking errors break the main flow
-                    logging.warning(f"Error in event tracking: {event_error}")
-
             return plan, steps
 
         except Exception as e:
@@ -497,23 +438,6 @@ class PlannerAgent(BaseAgent):
 
             # Store the clarification step
             await self._memory_store.add_step(clarification_step)
-
-            # Log the event
-            try:
-                track_event_if_configured(
-                    "Planner - Created fallback dummy plan due to parsing error",
-                    {
-                        "session_id": input_task.session_id,
-                        "user_id": self._user_id,
-                        "error": str(e),
-                        "description": input_task.description,
-                        "source": AgentType.PLANNER.value,
-                    },
-                )
-            except Exception as event_error:
-                logging.warning(
-                    f"Error in event tracking during fallback: {event_error}"
-                )
 
             return dummy_plan, [dummy_step, clarification_step]
 

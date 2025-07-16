@@ -2,16 +2,14 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from context.cosmos_memory_kernel import CosmosMemoryContext
-from event_utils import track_event_if_configured
-from kernel_agents.agent_base import BaseAgent
-from utils_date import format_date_for_user
-from models.messages_kernel import (ActionRequest, AgentMessage, AgentType,
+from memory import ConsoleMemoryContext
+from agents.base_agent import BaseAgent
+from datetime import datetime
+from models import (ActionRequest, AgentMessage, AgentType,
                                     HumanFeedback, HumanFeedbackStatus, InputTask,
                                     Plan, Step, StepStatus)
 # pylint: disable=E0611
 from semantic_kernel.functions.kernel_function import KernelFunction
-
 
 class GroupChatManager(BaseAgent):
     """GroupChatManager agent implementation using Semantic Kernel.
@@ -24,7 +22,7 @@ class GroupChatManager(BaseAgent):
         self,
         session_id: str,
         user_id: str,
-        memory_store: CosmosMemoryContext,
+        memory_store: ConsoleMemoryContext,
         tools: Optional[List[KernelFunction]] = None,
         system_message: Optional[str] = None,
         agent_name: str = AgentType.GROUP_CHAT_MANAGER.value,
@@ -159,16 +157,6 @@ class GroupChatManager(BaseAgent):
             )
         )
 
-        track_event_if_configured(
-            "Group Chat Manager - Received and added input task into the cosmos",
-            {
-                "session_id": message.session_id,
-                "user_id": self._user_id,
-                "content": message.description,
-                "source": AgentType.HUMAN.value,
-            },
-        )
-
         # Send the InputTask to the PlannerAgent
         planner_agent = self._agent_instances[AgentType.PLANNER.value]
         result = await planner_agent.handle_input_task(message)
@@ -224,7 +212,7 @@ class GroupChatManager(BaseAgent):
 
         # Provide generic context to the model
         current_date = datetime.now().strftime("%Y-%m-%d")
-        formatted_date = format_date_for_user(current_date)
+        formatted_date = datetime.now().strftime("%B %d, %Y")
         general_information = f"Today's date is {formatted_date}."
 
         # Get the general background information provided by the user in regards to the overall plan (not the steps) to add as context.
@@ -262,16 +250,7 @@ class GroupChatManager(BaseAgent):
                     step.status = StepStatus.rejected
                     step.human_approval_status = HumanFeedbackStatus.rejected
                     self._memory_store.update_step(step)
-                    track_event_if_configured(
-                        "Group Chat Manager - Steps has been rejected and updated into the cosmos",
-                        {
-                            "status": StepStatus.rejected,
-                            "session_id": message.session_id,
-                            "user_id": self._user_id,
-                            "human_approval_status": HumanFeedbackStatus.rejected,
-                            "source": step.agent,
-                        },
-                    )
+                    
         else:
             # Update and execute all steps if no specific step_id is provided
             for step in steps:
@@ -286,16 +265,6 @@ class GroupChatManager(BaseAgent):
                     step.status = StepStatus.rejected
                     step.human_approval_status = HumanFeedbackStatus.rejected
                     self._memory_store.update_step(step)
-                    track_event_if_configured(
-                        f"{AgentType.GROUP_CHAT_MANAGER.value} - Step has been rejected and updated into the cosmos",
-                        {
-                            "status": StepStatus.rejected,
-                            "session_id": message.session_id,
-                            "user_id": self._user_id,
-                            "human_approval_status": HumanFeedbackStatus.rejected,
-                            "source": step.agent,
-                        },
-                    )
 
     # Function to update step status and add feedback
     async def _update_step_status(
@@ -311,16 +280,6 @@ class GroupChatManager(BaseAgent):
         step.human_feedback = received_human_feedback
         step.status = StepStatus.completed
         await self._memory_store.update_step(step)
-        track_event_if_configured(
-            f"{AgentType.GROUP_CHAT_MANAGER.value} - Received human feedback, Updating step and updated into the cosmos",
-            {
-                "status": StepStatus.completed,
-                "session_id": step.session_id,
-                "user_id": self._user_id,
-                "human_feedback": received_human_feedback,
-                "source": step.agent,
-            },
-        )
 
     async def _execute_step(self, session_id: str, step: Step):
         """
@@ -329,15 +288,6 @@ class GroupChatManager(BaseAgent):
         # Update step status to 'action_requested'
         step.status = StepStatus.action_requested
         await self._memory_store.update_step(step)
-        track_event_if_configured(
-            f"{AgentType.GROUP_CHAT_MANAGER.value} - Update step to action_requested and updated into the cosmos",
-            {
-                "status": StepStatus.action_requested,
-                "session_id": step.session_id,
-                "user_id": self._user_id,
-                "source": step.agent,
-            },
-        )
 
         # generate conversation history for the invoked agent
         plan = await self._memory_store.get_plan_by_session(session_id=session_id)
@@ -398,18 +348,6 @@ class GroupChatManager(BaseAgent):
             )
         )
 
-        track_event_if_configured(
-            f"{AgentType.GROUP_CHAT_MANAGER.value} - Requesting {formatted_agent} to perform the action and added into the cosmos",
-            {
-                "session_id": session_id,
-                "user_id": self._user_id,
-                "plan_id": step.plan_id,
-                "content": f"Requesting {formatted_agent} to perform action: {step.action}",
-                "source": AgentType.GROUP_CHAT_MANAGER.value,
-                "step_id": step.id,
-            },
-        )
-
         if step.agent == AgentType.HUMAN.value:
             # we mark the step as complete since we have received the human feedback
             # Update step status to 'completed'
@@ -418,17 +356,7 @@ class GroupChatManager(BaseAgent):
             logging.info(
                 "Marking the step as complete - Since we have received the human feedback"
             )
-            track_event_if_configured(
-                "Group Chat Manager - Steps completed - Received the human feedback and updated into the cosmos",
-                {
-                    "session_id": session_id,
-                    "user_id": self._user_id,
-                    "plan_id": step.plan_id,
-                    "content": "Marking the step as complete - Since we have received the human feedback",
-                    "source": step.agent,
-                    "step_id": step.id,
-                },
-            )
+            
         else:
             # Use the agent from the step to determine which agent to send to
             agent = self._agent_instances[step.agent.value]

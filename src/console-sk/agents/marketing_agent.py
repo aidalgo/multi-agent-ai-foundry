@@ -1,12 +1,11 @@
 import logging
 from typing import Dict, List, Optional
  
-from context.cosmos_memory_kernel import CosmosMemoryContext
-from kernel_agents.agent_base import BaseAgent
-from kernel_tools.marketing_tools import MarketingTools
-from models.messages_kernel import AgentType
+from memory import ConsoleMemoryContext
+from agents.base_agent import BaseAgent
+from tools.marketing_tools import MarketingTools
+from models import AgentType
 from semantic_kernel.functions import KernelFunction
-
 
 class MarketingAgent(BaseAgent):
     """Marketing agent implementation using Semantic Kernel.
@@ -18,7 +17,7 @@ class MarketingAgent(BaseAgent):
         self,
         session_id: str,
         user_id: str,
-        memory_store: CosmosMemoryContext,
+        memory_store: ConsoleMemoryContext,
         tools: Optional[List[KernelFunction]] = None,
         system_message: Optional[str] = None,
         agent_name: str = AgentType.MARKETING.value,

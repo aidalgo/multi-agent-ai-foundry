@@ -1,14 +1,12 @@
 import logging
 from typing import Dict, List, Optional
 
-from context.cosmos_memory_kernel import CosmosMemoryContext
-from event_utils import track_event_if_configured
-from kernel_agents.agent_base import BaseAgent
-from models.messages_kernel import (AgentMessage, AgentType,
+from memory import ConsoleMemoryContext
+from agents.base_agent import BaseAgent
+from models import (AgentMessage, AgentType,
                                     ApprovalRequest, HumanClarification,
                                     HumanFeedback, StepStatus)
 from semantic_kernel.functions import KernelFunction
-
 
 class HumanAgent(BaseAgent):
     """Human agent implementation using Semantic Kernel.
@@ -20,7 +18,7 @@ class HumanAgent(BaseAgent):
         self,
         session_id: str,
         user_id: str,
-        memory_store: CosmosMemoryContext,
+        memory_store: ConsoleMemoryContext,
         tools: Optional[List[KernelFunction]] = None,
         system_message: Optional[str] = None,
         agent_name: str = AgentType.HUMAN.value,
@@ -156,17 +154,6 @@ class HumanAgent(BaseAgent):
         )
 
         # Track the event
-        track_event_if_configured(
-            "Human Agent - Received feedback for step and added into the cosmos",
-            {
-                "session_id": human_feedback.session_id,
-                "user_id": self._user_id,
-                "plan_id": step.plan_id,
-                "content": f"Received feedback for step: {step.action}",
-                "source": AgentType.HUMAN.value,
-                "step_id": human_feedback.step_id,
-            },
-        )
 
         # Notify the GroupChatManager that the step has been completed
         await self._memory_store.add_item(
@@ -180,16 +167,6 @@ class HumanAgent(BaseAgent):
         )
 
         # Track the approval request event
-        track_event_if_configured(
-            "Human Agent - Approval request sent for step and added into the cosmos",
-            {
-                "session_id": human_feedback.session_id,
-                "user_id": self._user_id,
-                "plan_id": step.plan_id,
-                "step_id": human_feedback.step_id,
-                "agent_id": "GroupChatManager",
-            },
-        )
 
         return "Human feedback processed successfully"
 
@@ -231,16 +208,7 @@ class HumanAgent(BaseAgent):
             )
         )
         # Track the event
-        track_event_if_configured(
-            "Human Agent - Provided clarification for plan",
-            {
-                "session_id": session_id,
-                "user_id": self._user_id,
-                "plan_id": plan.id,
-                "clarification": clarification_text,
-                "source": AgentType.HUMAN.value,
-            },
-        )
+        
         await self._memory_store.add_item(
             AgentMessage(
                 session_id=session_id,
@@ -251,13 +219,5 @@ class HumanAgent(BaseAgent):
                 step_id="",
             )
         )
-        track_event_if_configured(
-            "Planner - Updated with HumanClarification and added into the cosmos",
-            {
-                "session_id": session_id,
-                "user_id": self._user_id,
-                "content": "Thanks. The plan has been updated.",
-                "source": AgentType.PLANNER.value,
-            },
-        )
+        
         return f"Clarification provided for plan {plan.id}"

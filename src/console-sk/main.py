@@ -5,15 +5,9 @@ A simplified console version of the multi-agent system using Semantic Kernel and
 """
 
 import asyncio
-import json
 import logging
 import sys
-import uuid
 from pathlib import Path
-from typing import Dict, List, Optional
-
-# Add the backend directory to Python path
-sys.path.insert(0, str(Path(__file__).parent / "backend"))
 
 # Load environment variables from .env file
 try:
@@ -23,18 +17,7 @@ except ImportError:
     print("Warning: python-dotenv not installed. Environment variables won't be loaded from .env file.")
 
 from azure.identity import DefaultAzureCredential
-from backend.app_config import AppConfig
-from console_memory import ConsoleMemoryContext
-from backend.models.messages_kernel import (
-    AgentType,
-    HumanFeedback,
-    InputTask,
-    Plan,
-    PlanStatus,
-    Step,
-    StepStatus,
-)
-from utils_console import ConsoleAgentFactory, ConsoleUtils
+from console_app import ConsoleMACAE
 
 
 # Configure logging
@@ -45,239 +28,170 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class ConsoleMACAE:
-    """Console Multi-Agent Custom Automation Engine."""
+# Define available action categories and examples
+AVAILABLE_ACTIONS = {
+    "HR & Employee Management": [
+        "Onboard a new employee (name: John Doe)",
+        "Schedule orientation session",
+        "Assign mentor to employee",
+        "Set up payroll for employee",
+        "Process leave request",
+        "Schedule performance review",
+        "Update employee record",
+        "Generate employee directory"
+    ],
+    "IT & Technical Support": [
+        "Set up Office 365 account for employee",
+        "Configure laptop for new employee",
+        "Reset employee password",
+        "Set up VPN access",
+        "Install software for employee",
+        "Troubleshoot network issues",
+        "Handle cybersecurity incident",
+        "Configure server or database access"
+    ],
+    "Marketing & Communications": [
+        "Create marketing campaign",
+        "Analyze market trends",
+        "Generate social media posts",
+        "Plan advertising budget",
+        "Conduct customer survey",
+        "Perform competitor analysis",
+        "Schedule marketing event",
+        "Create content calendar"
+    ],
+    "Procurement & Asset Management": [
+        "Order hardware (laptops, monitors, etc.)",
+        "Order software licenses",
+        "Check inventory status",
+        "Process purchase order",
+        "Track order status",
+        "Manage vendor relationships",
+        "Handle equipment returns",
+        "Schedule maintenance"
+    ],
+    "Product & Service Management": [
+        "Add mobile extras pack to customer plan",
+        "Get product information",
+        "Modify customer service plan",
+        "Check plan eligibility",
+        "Process service upgrade/downgrade",
+        "Handle customer billing inquiry"
+    ]
+}
+
+
+def show_welcome_message():
+    """Display the welcome message and available actions."""
+    print("=" * 80)
+    print("   Multi-Agent Custom Automation Engine - Console")
+    print("=" * 80)
+    print()
+    print("🤖 Welcome to the Multi-Agent AI System!")
+    print()
     
-    def __init__(self):
-        """Initialize the console application."""
-        self.config = AppConfig()
-        self.session_id = str(uuid.uuid4())
-        self.user_id = "console_user"
-        self.memory_store = None
-        self.agents = {}
-        self.planner_agent = None
-        self.group_chat_manager = None
-        self.current_plan = None
-        
-    async def initialize(self):
-        """Initialize the console application."""
-        try:
-            # Initialize memory store
-            self.memory_store = ConsoleMemoryContext(self.session_id, self.user_id)
-            
-            # Create all agents
-            logger.info("Creating agents...")
-            self.agents = await ConsoleAgentFactory.create_all_agents(
-                session_id=self.session_id,
-                user_id=self.user_id,
-                memory_store=self.memory_store
-            )
-            
-            # Get specific agents
-            self.planner_agent = self.agents.get(AgentType.PLANNER.value)
-            self.group_chat_manager = self.agents.get(AgentType.GROUP_CHAT_MANAGER.value)
-            
-            logger.info("Console MACAE initialized successfully!")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize console application: {e}")
-            raise
+    print("📝 Example Requests:")
+    print("=" * 50)
     
-    async def run(self):
-        """Run the console application."""
-        print("="*60)
-        print("   Multi-Agent Custom Automation Engine - Console")
-        print("="*60)
-        print()
-        print("Welcome! This console application demonstrates the multi-agent system.")
-        print("You can interact with the planner agent to create and execute plans.")
-        print()
-        print("Available commands:")
-        print("  - Type your task/goal and press Enter")
-        print("  - Type 'status' to see current plan status")
-        print("  - Type 'help' to see this message again")
-        print("  - Type 'quit' or 'exit' to exit")
-        print()
-        
-        while True:
-            try:
-                user_input = input(">> ").strip()
-                
-                if not user_input:
-                    continue
-                    
-                if user_input.lower() in ['quit', 'exit']:
-                    print("Goodbye!")
-                    break
-                    
-                if user_input.lower() == 'help':
-                    self.show_help()
-                    continue
-                    
-                if user_input.lower() == 'status':
-                    await self.show_status()
-                    continue
-                    
-                # Process the user input as a task
-                await self.process_task(user_input)
-                
-            except KeyboardInterrupt:
-                print("\nGoodbye!")
-                break
-            except Exception as e:
-                logger.error(f"Error processing input: {e}")
-                print(f"Error: {e}")
+    examples = [
+        "onboard new employee Sarah Johnson",
+        "set up office 365 account for mike.smith@company.com",
+        "create marketing campaign for product launch",
+        "order laptop for new developer",
+        "schedule orientation for new hire",
+        "reset password for user john.doe",
+        "analyze market trends in technology sector",
+        "process purchase order for office supplies",
+        "configure VPN access for remote employee",
+        "create social media posts for holiday promotion"
+    ]
     
-    def show_help(self):
-        """Show help information."""
-        print("\nAvailable commands:")
-        print("  - Type your task/goal and press Enter")
-        print("  - Type 'status' to see current plan status")
-        print("  - Type 'help' to see this message again")
-        print("  - Type 'quit' or 'exit' to exit")
-        print()
+    for i, example in enumerate(examples, 1):
+        print(f"{i:2d}. {example}")
     
-    async def show_status(self):
-        """Show current plan status."""
-        if not self.current_plan:
-            print("No active plan.")
-            return
-            
-        plan = await self.memory_store.get_plan(self.current_plan.id)
-        if not plan:
-            print("No active plan found.")
-            return
-            
-        steps = await self.memory_store.get_steps_for_plan(plan.id)
-        
-        print(f"\nCurrent Plan: {plan.initial_goal}")
-        print(f"Status: {plan.overall_status}")
-        print(f"Steps: {len(steps)}")
-        
-        for i, step in enumerate(steps, 1):
-            status_emoji = ConsoleUtils.format_step_status(step.status.value)
-            agent_name = ConsoleUtils.format_agent_name(step.agent.value)
-            print(f"  {i}. {status_emoji} {agent_name}: {step.action}")
-        print()
+    print()
+    print("💡 How to use:")
+    print("• Type a natural language request (e.g., 'onboard new employee John Smith')")
+    print("• Use 'actions' to see all available actions")
+    print("• Use 'examples' to see example requests")
+    print("• Use 'status' to check current plan status")
+    print("• Use 'help' for this message")
+    print("• Use 'quit' or 'exit' to exit")
+    print()
+
+
+def show_examples():
+    """Show example requests."""
+    print("\n📝 Example Requests:")
+    print("=" * 50)
     
-    async def process_task(self, task: str):
-        """Process a user task."""
-        print(f"\nProcessing task: {task}")
-        print("-" * 50)
-        
-        try:
-            # Create input task
-            input_task = InputTask(
-                session_id=self.session_id,
-                description=task
-            )
-            
-            # Send to GroupChatManager to handle the entire flow
-            print("🤖 Sending task to GroupChatManager...")
-            
-            # Check if GroupChatManager exists
-            if not self.group_chat_manager:
-                print("❌ GroupChatManager not available!")
-                return
-                
-            # GroupChatManager will handle the entire workflow:
-            # 1. Send to planner to create plan
-            # 2. Show plan to user for approval
-            # 3. Execute all steps if approved
-            # 4. Handle any human feedback during execution
-            plan_response = await self.group_chat_manager.handle_input_task(input_task)
-            
-            if plan_response:
-                print("✅ Plan created successfully!")
-                
-                # Get the created plan
-                self.current_plan = await self.memory_store.get_latest_plan(
-                    self.session_id, self.user_id
-                )
-                
-                if self.current_plan:
-                    print(f"\n📋 Plan: {self.current_plan.initial_goal}")
-                    print(f"Status: {self.current_plan.overall_status}")
-                    
-                    # Get steps
-                    steps = await self.memory_store.get_steps_for_plan(self.current_plan.id)
-                    print(f"Steps ({len(steps)}):")
-                    
-                    for i, step in enumerate(steps, 1):
-                        agent_name = ConsoleUtils.format_agent_name(step.agent.value)
-                        truncated_action = ConsoleUtils.truncate_text(step.action, 80)
-                        print(f"  {i}. {agent_name}: {truncated_action}")
-                    
-                    # Ask for approval to execute
-                    print("\n" + "="*50)
-                    approve = input("Do you want to execute this plan? (y/n): ").lower()
-                    
-                    if approve in ['y', 'yes']:
-                        # Let GroupChatManager handle the execution and stay in control
-                        await self.start_group_chat_execution()
-                    else:
-                        print("Plan execution cancelled.")
-                else:
-                    print("❌ Could not retrieve created plan.")
-            else:
-                print("❌ Failed to create plan.")
-                
-        except Exception as e:
-            logger.error(f"Error processing task: {e}")
-            print(f"❌ Error: {e}")
+    examples = [
+        "onboard new employee Sarah Johnson",
+        "set up office 365 account for mike.smith@company.com",
+        "create marketing campaign for product launch",
+        "order laptop for new developer",
+        "schedule orientation for new hire",
+        "reset password for user john.doe",
+        "analyze market trends in technology sector",
+        "process purchase order for office supplies",
+        "configure VPN access for remote employee",
+        "create social media posts for holiday promotion"
+    ]
     
-    async def start_group_chat_execution(self):
-        """Start the group chat execution loop where GroupChatManager stays in control."""
-        if not self.current_plan:
-            print("No plan to execute.")
-            return
-            
-        print("\n🚀 Starting GroupChatManager execution loop...")
-        print("-" * 50)
-        
-        try:
-            # Check if GroupChatManager is available
-            if not self.group_chat_manager:
-                print("❌ GroupChatManager not available!")
-                return
-                
-            # Let GroupChatManager handle the entire execution workflow
-            print("🤖 GroupChatManager taking control of execution...")
-            
-            # Execute the plan through GroupChatManager
-            await self.group_chat_manager.execute_plan(self.current_plan)
-            
-            # Check if all steps are completed
-            steps = await self.memory_store.get_steps_for_plan(self.current_plan.id)
-            incomplete_steps = [step for step in steps if step.status not in [StepStatus.completed, StepStatus.rejected]]
-            
-            if incomplete_steps:
-                print(f"\n⏳ {len(incomplete_steps)} steps still in progress...")
-                print("GroupChatManager will continue managing execution...")
-                
-                # Here you could implement a loop to check for completion
-                # or wait for human feedback if needed
-                while incomplete_steps:
-                    # Wait a bit and check again
-                    await asyncio.sleep(2)
-                    steps = await self.memory_store.get_steps_for_plan(self.current_plan.id)
-                    incomplete_steps = [step for step in steps if step.status not in [StepStatus.completed, StepStatus.rejected]]
-                    
-                    if len(incomplete_steps) == 0:
-                        break
-                        
-                    # Show progress
-                    completed_count = len(steps) - len(incomplete_steps)
-                    print(f"📊 Progress: {completed_count}/{len(steps)} steps completed")
-            
-            # Final status update
-            print("\n" + "="*50)
-            print("✅ GroupChatManager execution completed!")
-            await self.show_status()
-            
-        except Exception as e:
-            logger.error(f"Error in group chat execution: {e}")
-            print(f"❌ Error: {e}")
+    for i, example in enumerate(examples, 1):
+        print(f"{i:2d}. {example}")
+    
+    print("\n💡 Just type any of these examples or create your own request!")
+    print()
+
+
+def show_all_actions():
+    """Show all available actions in detail."""
+    print("\n🛠️  All Available Actions:")
+    print("=" * 50)
+    
+    for category, actions in AVAILABLE_ACTIONS.items():
+        print(f"\n🔸 {category}:")
+        for action in actions:
+            print(f"   • {action}")
+    
+    print("\n💡 You can request any of these actions in natural language!")
+    print("Example: 'I need to onboard a new employee named Alex Wilson'")
+    print()
+
+
+def collect_missing_info(task_description: str) -> str:
+    """Collect missing information from user based on task type."""
+    task_lower = task_description.lower()
+    
+    # Common patterns that might need additional info
+    if "onboard" in task_lower or "new employee" in task_lower:
+        if not any(name in task_lower for name in ["john", "jane", "smith", "doe", "johnson", "williams", "brown", "davis", "miller", "wilson", "moore", "taylor", "anderson", "thomas", "jackson", "white", "harris", "martin", "thompson", "garcia", "martinez", "robinson", "clark", "rodriguez", "lewis", "lee", "walker", "hall", "allen", "young", "hernandez", "king", "wright", "lopez", "hill", "scott", "green", "adams", "baker", "gonzalez", "nelson", "carter", "mitchell", "perez", "roberts", "turner", "phillips", "campbell", "parker", "evans", "edwards", "collins", "stewart", "sanchez", "morris", "rogers", "reed", "cook", "morgan", "bell", "murphy", "bailey", "rivera", "cooper", "richardson", "cox", "howard", "ward", "torres", "peterson", "gray", "ramirez", "james", "watson", "brooks", "kelly", "sanders", "price", "bennett", "wood", "barnes", "ross", "henderson", "coleman", "jenkins", "perry", "powell", "long", "patterson", "hughes", "flores", "washington", "butler", "simmons", "foster", "gonzales", "bryant", "alexander", "russell", "griffin", "diaz", "hayes"]):
+            print("\n📝 I need some additional information:")
+            employee_name = input("Employee name: ").strip()
+            if employee_name:
+                return f"{task_description} for {employee_name}"
+    
+    elif "create" in task_lower and "campaign" in task_lower:
+        if not any(prod in task_lower for prod in ["product", "service", "launch", "promotion", "sale", "brand", "holiday", "summer", "winter", "spring", "fall"]):
+            print("\n📝 I need some additional information:")
+            campaign_type = input("Campaign type/focus (e.g., 'product launch', 'holiday promotion'): ").strip()
+            if campaign_type:
+                return f"{task_description} for {campaign_type}"
+    
+    elif "order" in task_lower and not any(item in task_lower for item in ["laptop", "monitor", "keyboard", "mouse", "software", "license", "hardware", "equipment"]):
+        print("\n📝 I need some additional information:")
+        item_type = input("What items to order (e.g., 'laptop', 'software licenses'): ").strip()
+        if item_type:
+            return f"{task_description} - {item_type}"
+    
+    elif "reset password" in task_lower and not any(user in task_lower for user in ["@", "."]):
+        print("\n📝 I need some additional information:")
+        username = input("Username or email: ").strip()
+        if username:
+            return f"{task_description} for {username}"
+    
+    return task_description
 
 
 async def main():
@@ -287,14 +201,60 @@ async def main():
         console_app = ConsoleMACAE()
         await console_app.initialize()
         
-        # Run the console application
-        await console_app.run()
+        # Show welcome message
+        show_welcome_message()
+        
+        # Run the interactive console loop
+        while True:
+            try:
+                user_input = input(">> ").strip()
+                
+                if not user_input:
+                    continue
+                    
+                if user_input.lower() in ['quit', 'exit']:
+                    print("👋 Goodbye!")
+                    break
+                    
+                if user_input.lower() in ['help']:
+                    show_welcome_message()
+                    continue
+                    
+                if user_input.lower() in ['actions', 'list']:
+                    show_all_actions()
+                    continue
+                    
+                if user_input.lower() in ['examples', 'example']:
+                    show_examples()
+                    continue
+                    
+                if user_input.lower() == 'status':
+                    await console_app.show_status()
+                    continue
+                
+                # Collect additional information if needed
+                enhanced_task = collect_missing_info(user_input)
+                
+                # Process the task
+                print(f"\n🔄 Processing: {enhanced_task}")
+                print("-" * 60)
+                
+                # Process the user input as a task
+                await console_app.process_task(enhanced_task)
+                
+            except KeyboardInterrupt:
+                print("\n👋 Goodbye!")
+                break
+            except Exception as e:
+                logger.error(f"Error processing input: {e}")
+                print(f"❌ Error: {e}")
+                print("💡 Try typing 'help' for available commands or 'examples' for sample requests.")
         
     except KeyboardInterrupt:
-        print("\nApplication interrupted by user.")
+        print("\n👋 Application interrupted by user.")
     except Exception as e:
         logger.error(f"Fatal error: {e}")
-        print(f"Fatal error: {e}")
+        print(f"❌ Fatal error: {e}")
         sys.exit(1)
 
 

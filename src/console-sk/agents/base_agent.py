@@ -3,17 +3,15 @@ from abc import abstractmethod
 from typing import (Any, List, Mapping, Optional)
 
 # Import the new AppConfig instance
-from app_config import config
-from context.cosmos_memory_kernel import CosmosMemoryContext
-from event_utils import track_event_if_configured
-from models.messages_kernel import (ActionRequest, ActionResponse,
-                                    AgentMessage, Step, StepStatus)
+from config import config
+from memory import ConsoleMemoryContext
+from models import (ActionRequest, ActionResponse,
+                      AgentMessage, Step, StepStatus)
 from semantic_kernel.agents.azure_ai.azure_ai_agent import AzureAIAgent
 from semantic_kernel.functions import KernelFunction
 
 # Default formatting instructions used across agents
 DEFAULT_FORMATTING_INSTRUCTIONS = "Instructions: returning the output of this function call verbatim to the user in markdown. Then write AGENT SUMMARY: and then include a summary of what you did."
-
 
 class BaseAgent(AzureAIAgent):
     """BaseAgent implemented using Semantic Kernel with Azure AI Agent support."""
@@ -23,7 +21,7 @@ class BaseAgent(AzureAIAgent):
         agent_name: str,
         session_id: str,
         user_id: str,
-        memory_store: CosmosMemoryContext,
+        memory_store: ConsoleMemoryContext,
         tools: Optional[List[KernelFunction]] = None,
         system_message: Optional[str] = None,
         client=None,
@@ -158,34 +156,8 @@ class BaseAgent(AzureAIAgent):
                 )
             )
 
-            # Track telemetry
-            track_event_if_configured(
-                "Base agent - Added into the cosmos",
-                {
-                    "session_id": action_request.session_id,
-                    "user_id": self._user_id,
-                    "plan_id": action_request.plan_id,
-                    "content": f"{response_content}",
-                    "source": self._agent_name,
-                    "step_id": action_request.step_id,
-                },
-            )
-
         except Exception as e:
             logging.exception(f"Error during agent execution: {e}")
-
-            # Track error in telemetry
-            track_event_if_configured(
-                "Base agent - Error during agent execution, captured into the cosmos",
-                {
-                    "session_id": action_request.session_id,
-                    "user_id": self._user_id,
-                    "plan_id": action_request.plan_id,
-                    "content": f"{e}",
-                    "source": self._agent_name,
-                    "step_id": action_request.step_id,
-                },
-            )
 
             # Return an error response
             response = ActionResponse(
@@ -201,21 +173,6 @@ class BaseAgent(AzureAIAgent):
         step.status = StepStatus.completed
         step.agent_reply = response_content
         await self._memory_store.update_step(step)
-
-        # Track step completion in telemetry
-        track_event_if_configured(
-            "Base agent - Updated step and updated into the cosmos",
-            {
-                "status": StepStatus.completed,
-                "session_id": action_request.session_id,
-                "agent_reply": f"{response_content}",
-                "user_id": self._user_id,
-                "plan_id": action_request.plan_id,
-                "content": f"{response_content}",
-                "source": self._agent_name,
-                "step_id": action_request.step_id,
-            },
-        )
 
         # Create and return action response
         response = ActionResponse(

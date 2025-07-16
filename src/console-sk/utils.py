@@ -1,25 +1,13 @@
 """
-Console Agent Factory - Simplified agent creation for console application.
-This uses the existing agent implementations but with simplified initialization.
+Utility functions and agent factory for the console application.
+Simplified version of utils_console.py
 """
 
 import logging
-import sys
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
 
-# Add the backend directory to Python path
-sys.path.insert(0, str(Path(__file__).parent / "backend"))
-
-# Load environment variables from .env file
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # dotenv is optional for this module
-
-from console_memory import ConsoleMemoryContext
-from backend.models.messages_kernel import AgentType
+from config import config
+from models import AgentType
 
 logger = logging.getLogger(__name__)
 
@@ -32,40 +20,30 @@ class ConsoleAgentFactory:
         cls,
         session_id: str,
         user_id: str,
-        memory_store: Optional[ConsoleMemoryContext] = None,
+        memory_store: Optional[Any] = None,
         temperature: float = 0.0,
     ) -> Dict[str, Any]:
-        """Create all agents for a session.
-        
-        Args:
-            session_id: The session identifier
-            user_id: The user identifier
-            memory_store: Optional memory store (will create if not provided)
-            temperature: Temperature for agent responses
-            
-        Returns:
-            Dictionary of agent instances mapped by their names
-        """
+        """Create all agents for a session."""
         
         if memory_store is None:
+            from memory import ConsoleMemoryContext
             memory_store = ConsoleMemoryContext(session_id, user_id)
         
         agents = {}
         
         # Import agent classes
         try:
-            from backend.kernel_agents.hr_agent import HrAgent
-            from backend.kernel_agents.marketing_agent import MarketingAgent
-            from backend.kernel_agents.product_agent import ProductAgent
-            from backend.kernel_agents.procurement_agent import ProcurementAgent
-            from backend.kernel_agents.tech_support_agent import TechSupportAgent
-            from backend.kernel_agents.generic_agent import GenericAgent
-            from backend.kernel_agents.human_agent import HumanAgent
-            from backend.kernel_agents.planner_agent import PlannerAgent
-            from backend.kernel_agents.group_chat_manager import GroupChatManager
+            from agents.hr_agent import HrAgent
+            from agents.marketing_agent import MarketingAgent
+            from agents.product_agent import ProductAgent
+            from agents.procurement_agent import ProcurementAgent
+            from agents.tech_support_agent import TechSupportAgent
+            from agents.generic_agent import GenericAgent
+            from agents.human_agent import HumanAgent
+            from agents.planner_agent import PlannerAgent
+            from agents.group_chat_manager import GroupChatManager
             
             # Create AI project client for agent creation
-            from backend.app_config import config
             ai_project_client = config.get_ai_project_client()
             
             # Agent creation mapping

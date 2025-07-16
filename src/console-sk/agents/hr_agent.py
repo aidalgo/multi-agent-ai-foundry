@@ -1,55 +1,56 @@
 import logging
 from typing import Dict, List, Optional
 
-from context.cosmos_memory_kernel import CosmosMemoryContext
-from kernel_agents.agent_base import BaseAgent
-from kernel_tools.generic_tools import GenericTools
-from models.messages_kernel import AgentType
+from memory import ConsoleMemoryContext
+from agents.base_agent import BaseAgent
+from tools.hr_tools import HrTools
+from models import AgentType
 from semantic_kernel.functions import KernelFunction
 
+class HrAgent(BaseAgent):
+    """HR agent implementation using Semantic Kernel.
 
-class GenericAgent(BaseAgent):
-    """Generic agent implementation using Semantic Kernel."""
+    This agent provides HR-related functions such as onboarding, benefits management,
+    and employee administration.
+    """
 
     def __init__(
         self,
         session_id: str,
         user_id: str,
-        memory_store: CosmosMemoryContext,
+        memory_store: ConsoleMemoryContext,
         tools: Optional[List[KernelFunction]] = None,
         system_message: Optional[str] = None,
-        agent_name: str = AgentType.GENERIC.value,
+        agent_name: str = AgentType.HR.value,
         client=None,
         definition=None,
     ) -> None:
-        """Initialize the Generic Agent.
+        """Initialize the HR Agent.
 
         Args:
+            kernel: The semantic kernel instance
             session_id: The current session identifier
             user_id: The user identifier
             memory_store: The Cosmos memory context
             tools: List of tools available to this agent (optional)
             system_message: Optional system message for the agent
-            agent_name: Optional name for the agent (defaults to "GenericAgent")
-            config_path: Optional path to the Generic tools configuration file
+            agent_name: Optional name for the agent (defaults to "HrAgent")
+            config_path: Optional path to the HR tools configuration file
             client: Optional client instance
             definition: Optional definition instance
         """
         # Load configuration if tools not provided
         if not tools:
-            # Get tools directly from GenericTools class
-            tools_dict = GenericTools.get_all_kernel_functions()
-
+            # Get tools directly from HrTools class
+            tools_dict = HrTools.get_all_kernel_functions()
             tools = [KernelFunction.from_method(func) for func in tools_dict.values()]
 
             # Use system message from config if not explicitly provided
             if not system_message:
                 system_message = self.default_system_message(agent_name)
-
             # Use agent name from config if available
-            agent_name = AgentType.GENERIC.value
+            agent_name = AgentType.HR.value
 
-        # Call the parent initializer
         super().__init__(
             agent_name=agent_name,
             session_id=session_id,
@@ -83,7 +84,7 @@ class GenericAgent(BaseAgent):
         client = kwargs.get("client")
 
         try:
-            logging.info("Initializing GenericAgent from async init azure AI Agent")
+            logging.info("Initializing HRAgent from async init azure AI Agent")
 
             # Create the Azure AI Agent using AppConfig with string instructions
             agent_definition = await cls._create_azure_ai_agent_definition(
@@ -116,23 +117,9 @@ class GenericAgent(BaseAgent):
         Returns:
             The default system message for the agent
         """
-        return "You are a Generic agent that can help with general questions and provide basic information. You can search for information and perform simple calculations."
+        return "You are an AI Agent. You have knowledge about HR (e.g., human resources), policies, procedures, and onboarding guidelines."
 
     @property
     def plugins(self):
-        """Get the plugins for the generic agent."""
-        return GenericTools.get_all_kernel_functions()
-
-    # Explicitly inherit handle_action_request from the parent class
-    async def handle_action_request(self, action_request_json: str) -> str:
-        """Handle an action request from another agent or the system.
-
-        This method is inherited from BaseAgent but explicitly included here for clarity.
-
-        Args:
-            action_request_json: The action request as a JSON string
-
-        Returns:
-            A JSON string containing the action response
-        """
-        return await super().handle_action_request(action_request_json)
+        """Get the plugins for the HR agent."""
+        return HrTools.get_all_kernel_functions()

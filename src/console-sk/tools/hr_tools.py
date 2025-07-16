@@ -2,10 +2,20 @@ import inspect
 from typing import Annotated, Callable
 
 from semantic_kernel.functions import kernel_function
-from models.messages_kernel import AgentType
+from models import AgentType
 import json
 from typing import get_type_hints
-from utils_date import format_date_for_user
+from datetime import datetime
+
+def format_date_for_user(date_str):
+    """Simple date formatting function to replace the missing utils_date module."""
+    try:
+        if isinstance(date_str, str) and "-" in date_str:
+            return datetime.strptime(date_str, "%Y-%m-%d").strftime("%B %d, %Y")
+        else:
+            return datetime.now().strftime("%B %d, %Y")
+    except:
+        return str(date_str)
 
 
 class HrTools:
@@ -16,7 +26,7 @@ class HrTools:
     @staticmethod
     @kernel_function(description="Schedule an orientation session for a new employee.")
     async def schedule_orientation_session(employee_name: str, date: str) -> str:
-        formatted_date = format_date_for_user(date)
+        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%B %d, %Y") if "-" in date else datetime.now().strftime("%B %d, %Y")
 
         return (
             f"##### Orientation Session Scheduled\n"
