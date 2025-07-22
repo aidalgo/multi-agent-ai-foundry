@@ -1,38 +1,55 @@
-# Multi-Agent Custom Automation Engine - Console Version
+# Multi-Agent Custom Automation Engine - Console Demo
 
-Welcome to the *Multi-Agent Custom Automation Engine* console application, designed to help businesses leverage AI agents for automating complex organizational tasks through a command-line interface. This console version provides a foundation for building AI-driven orchestration systems that can coordinate multiple specialized agents to accomplish various business processes.
+Welcome to the *Multi-Agent Custom Automation Engine* console demonstration, designed to showcase how AI agents can automate complex organizational tasks through an interactive command-line interface. This console demo provides a hands-on way to explore AI-driven orchestration systems that coordinate multiple specialized agents to accomplish various business processes.
 
 When dealing with complex organizational tasks, users often face significant challenges, including coordinating across multiple departments, maintaining consistency in processes, and ensuring efficient resource utilization.
 
-The Multi-Agent Custom Automation Engine console application allows users to specify tasks through an interactive console and have them automatically processed by a group of AI agents, each specialized in different aspects of the business. This automation not only saves time but also ensures accuracy and consistency in task execution.
+The Multi-Agent Custom Automation Engine console demo allows users to input tasks through an interactive console and see how they are automatically processed by a group of AI agents, each specialized in different aspects of business operations.
 
 <br/>
 
 <div align="center">
   
-[**SOLUTION OVERVIEW**](#solution-overview) \| [**QUICK DEPLOY**](#quick-deploy) \| [**BUSINESS SCENARIO**](#business-scenario) \| [**SUPPORTING DOCUMENTATION**](#supporting-documentation)
+[**DEMO OVERVIEW**](#demo-overview) \| [**GETTING STARTED**](#getting-started) \| [**BUSINESS SCENARIO**](#business-scenario) \| [**DOCUMENTATION**](#documentation)
 
 </div>
 <br/>
 
 <h2><img src="./docs/images/readme/solution-overview.png" width="48" />
-Solution overview
+Demo overview
 </h2>
 
-The solution leverages Azure OpenAI Service and Azure AI Foundry to create an intelligent automation pipeline through a console interface. It uses a multi-agent approach where specialized AI agents work together to plan, execute, and validate tasks based on user input through an interactive command-line interface.
+This console demo leverages Azure OpenAI Service and Azure AI Foundry to create an intelligent automation pipeline through an interactive command-line interface. It demonstrates a multi-agent approach where specialized AI agents work together to plan, execute, and validate tasks based on user input.
 
-### Solution architecture
+**🎯 This is a demonstration application designed for:**
+- Learning about multi-agent AI systems
+- Exploring Azure AI capabilities
+- Prototyping automation workflows
+- Understanding agent coordination patterns
+
+**📺 Console Interface Architecture**
+```
+User Input → Planner Agent → Specialized Agents → Coordinated Response
+    ↓              ↓               ↓                    ↓
+ Task Entry → Plan Creation → Task Execution → Results Display
+```
+
+### Console Demo Architecture
+The original web application architecture diagrams below show the full solution concept. This console demo implements the core multi-agent orchestration in a simplified, interactive format.
+
 |![image](./docs/images/readme/architecture.png)|
 |---|
+|*Original web application architecture (reference)*|
 
-### Agentic architecture
+### Agent Interaction Flow
 |![image](./docs/images/readme/agent_flow.png)|
 |---|
+|*Multi-agent coordination pattern (implemented in console)*|
 
-### How to customize
-If you'd like to customize the solution accelerator, here are some common areas to start:
+### How to customize this demo
+If you'd like to customize the console demo for your specific use cases:
 
-[Custom scenario](./docs/CustomizeSolution.md)
+[Customization Guide](./docs/CustomizeSolution.md)
 
 <br/>
 
@@ -42,157 +59,176 @@ If you'd like to customize the solution accelerator, here are some common areas 
 
 [Azure AI Foundry Documentation](https://learn.microsoft.com/en-us/azure/ai-foundry/)
 
-[Azure Container App documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-custom-container?tabs=core-tools%2Cacr%2Cazure-cli2%2Cazure-cli&pivots=container-apps)
-
 <br/>
 
-### Key features
+### Key demo features
 <details open>
-  <summary>Click to learn more about the key features this solution enables</summary>
+  <summary>Click to learn more about what this console demo demonstrates</summary>
 
-  - **Allows people to focus on what matters** <br/>
-  By doing the heavy lifting involved with coordinating activities across an organization, people's time is freed up to focus on their specializations.
+  - **Multi-Agent Coordination** <br/>
+  Shows how different AI agents (HR, Marketing, Product, etc.) work together to accomplish complex tasks.
   
-  - **Enabling GenAI to scale** <br/>
-  By not needing to build one application after another, organizations are able to reduce the friction of adopting GenAI across their entire organization. One capability can unlock almost unlimited use cases.
+  - **Interactive Learning** <br/>
+  Provides hands-on experience with AI agent orchestration through a simple console interface.
 
-  - **Applicable to most industries** <br/>
-  These are common challenges that most organizations face, across most industries.
+  - **Azure AI Integration** <br/>
+  Demonstrates real integration with Azure OpenAI Service and Azure AI Foundry.
 
-  - **Efficient task automation** <br/>
-  Streamlining the process of analyzing, planning, and executing complex tasks reduces time and effort required to complete organizational processes.
+  - **Customizable Framework** <br/>
+  Serves as a foundation for building your own multi-agent solutions.
 
 </details>
 
 <br /><br />
 <h2><img src="./docs/images/readme/quick-deploy.png" width="48" />
-Quick deploy
+Getting started
 </h2>
 
-### How to install or deploy
-Follow the console setup instructions to run this application locally.
+### 🚀 Run the Console Demo
 
-[🚀 **Get Started - Setup Guide**](./SETUP.md)
-<br/><br/>
+**Prerequisites:**
+- Azure subscription with Azure OpenAI access
+- Python 3.8+
+- Azure CLI
 
-<br/><br/>
+**Quick Start:**
+1. Set up your Azure resources (Azure OpenAI + AI Foundry)
+2. Configure your environment
+3. Run the console application
+
+[� **Complete Setup Guide**](./SETUP.md)
+
+### 💡 Try Sample Prompts
+Once running, try these examples:
+- "Launch a new marketing campaign"
+- "Help me onboard a new employee"
+- "Plan a product launch strategy"
+
+[📝 **More Examples**](./docs/SampleQuestions.md)
 
 > ℹ️ **Note: Azure OpenAI Quota**
  <br/>Make sure you have sufficient Azure OpenAI quota in your subscription. You can check your quota in the Azure portal under your Azure OpenAI resource.
 
 <br/>
 
-### Prerequisites and Costs
+### Requirements and Costs
 
-To deploy this solution accelerator, ensure you have access to an [Azure subscription](https://azure.microsoft.com/free/) with the necessary permissions to create **resource groups and resources**. Follow the steps in [Azure Account Set Up](./docs/AzureAccountSetUp.md).
+**Azure Requirements:**
+- [Azure subscription](https://azure.microsoft.com/free/) with permissions to create resources
+- Access to Azure OpenAI Service
+- Azure AI Foundry project
 
-Check the [Azure Products by Region](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) page and select a **region** where the following services are available: Azure OpenAI Service.
+**Supported Regions:**
+East US, East US2, Japan East, UK South, Sweden Central (check [Azure Products by Region](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) for current availability)
 
-Here are some example regions where the services are available: East US, East US2, Japan East, UK South, Sweden Central.
+**Cost Structure:**
+This console demo uses pay-per-use Azure services:
 
-Pricing varies per region and usage, so it isn't possible to predict exact costs for your usage. The console application uses Azure OpenAI Service on a usage-based pricing tier.
-
-Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator) to calculate the cost of this solution in your subscription.
-| Product | Description | Cost |
+| Service | Purpose | Cost |
 |---|---|---|
-| [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/) | Powers the AI agents for task automation | [Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) |
-| [Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/) | Provides the project infrastructure for AI agents | [Pricing](https://azure.microsoft.com/pricing/details/machine-learning/) |
+| [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/) | Powers the AI agents | [Usage-based pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) |
+| [Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/) | Agent project infrastructure | [Minimal project costs](https://azure.microsoft.com/pricing/details/machine-learning/) |
+
+💡 **Cost Tip:** Since this runs locally, you only pay for AI model usage during console sessions.
 
 <br/>
 
->⚠️ **Important:** The console application runs locally and does not require Azure resource cleanup. However, you will incur costs for Azure OpenAI Service usage during operation.
+
 
 <br /><br />
 <h2><img src="./docs/images/readme/business-scenario.png" width="48" />
 Business Scenario
 </h2>
 
-|![image](./docs/images/readme/application.png)|
-|---|
+### 🎯 Console Demo Experience
 
-<br/>
+**The Challenge:**
+Imagine you're a business manager who needs to coordinate a complex project that involves multiple departments. Traditionally, this would require:
+- Scheduling meetings with HR, Marketing, Product teams
+- Manually tracking action items across departments  
+- Ensuring consistent communication and follow-up
+- Managing dependencies between different workstreams
 
-Companies maintaining and modernizing their business processes often face challenges in coordinating complex tasks across multiple departments. They may have various processes that need to be automated and coordinated efficiently. Some of the challenges they face include:
+**The Console Demo:**
+Instead, you simply open a terminal and type:
+```
+> "Help me launch a new marketing campaign for our Q2 product release"
+```
 
-- Difficulty coordinating activities across different departments
-- Time-consuming process to manually manage complex workflows
-- High risk of errors from manual coordination, which can lead to process inefficiencies
-- Lack of available resources to handle increasing automation demands
+**What Happens Next:**
+1. **Planner Agent** analyzes your request and creates a coordinated plan
+2. **Marketing Agent** suggests campaign strategies and channels
+3. **Product Agent** provides technical specifications and positioning
+4. **HR Agent** identifies team resource needs
+5. **Procurement Agent** estimates budget requirements
+6. **All agents coordinate** to deliver a comprehensive, actionable plan
 
-By using the *Multi-Agent Custom Automation Engine* solution accelerator, users can automate these processes, ensuring that all tasks are accurately coordinated and executed efficiently.
+### 💼 Real-World Applications
 
-### Business value
+This console demo showcases automation patterns applicable to:
+
+- **Project Planning**: Multi-department initiative coordination
+- **Process Automation**: Standardized workflow execution
+- **Resource Allocation**: Cross-functional team planning  
+- **Compliance Management**: Multi-stakeholder review processes
+- **Strategic Planning**: Coordinated business analysis
+
+### 🔄 Interactive Learning
+
+The console interface lets you:
+- **Experiment** with different prompt styles
+- **Observe** how agents coordinate and specialize
+- **Learn** about multi-agent system patterns
+- **Prototype** your own automation scenarios
+
+### Business value demonstration
 <details>
-  <summary>Click to learn more about what value this solution provides</summary>
+  <summary>Click to learn more about what this demo showcases</summary>
 
-  - **Process Efficiency** <br/>
-  Automate the coordination of complex tasks, significantly reducing processing time and effort.
+  - **Process Automation Patterns** <br/>
+  Demonstrates how AI can coordinate complex, multi-step business processes.
 
-  - **Error Reduction** <br/>
-  Multi-agent validation ensures accurate task execution and maintains process integrity.
+  - **Agent Specialization** <br/>
+  Shows how different agents can be optimized for specific domains (HR, Marketing, Finance, etc.).
 
-  - **Resource Optimization** <br/>
-  Better utilization of human resources by focusing on specialized tasks.
+  - **Scalable Architecture** <br/>
+  Provides a foundation that can be extended for production use cases.
 
-  - **Cost Efficiency** <br/>
-  Reduces manual coordination efforts and improves overall process efficiency.
-
-  - **Scalability** <br/>
-  Enables organizations to handle increasing automation demands without proportional resource increases.
+  - **Cost-Effective Exploration** <br/>
+  Allows organizations to experiment with multi-agent AI without infrastructure overhead.
 
 </details>
 
 <br /><br />
 
 <h2><img src="./docs/images/readme/supporting-documentation.png" width="48" />
-Supporting documentation
+Documentation
 </h2>
 
-### Security guidelines
+### 📚 Available Guides
 
-This template uses Azure Key Vault to store all connections to communicate between resources.
-
-This template also uses [Managed Identity](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) for local development and deployment.
-
-To ensure continued best practices in your own repository, we recommend that anyone creating solutions based on our templates ensure that the [Github secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning) setting is enabled.
-
-You may want to consider additional security measures, such as:
-
-* Enabling Microsoft Defender for Cloud to [secure your Azure resources](https://learn.microsoft.com/en-us/azure/defender-for-cloud/).
-* Protecting the Azure Container Apps instance with a [firewall](https://learn.microsoft.com/azure/container-apps/waf-app-gateway) and/or [Virtual Network](https://learn.microsoft.com/azure/container-apps/networking?tabs=workload-profiles-env%2Cazure-cli).
-
-<br/>
-
-### Cross references
-Check out similar solution accelerators
-
-| Solution Accelerator | Description |
+| Guide | Purpose |
 |---|---|
-| [Document Knowledge Mining](https://github.com/microsoft/Document-Knowledge-Mining-Solution-Accelerator) | Extract structured information from unstructured documents using AI |
-| [Modernize your Code](https://github.com/microsoft/Modernize-your-Code-Solution-Accelerator) | Automate the translation of SQL queries between different dialects |
-| [Conversation Knowledge Mining](https://github.com/microsoft/Conversation-Knowledge-Mining-Solution-Accelerator) | Enable organizations to derive insights from volumes of conversational data using generative AI |
+| [Setup Guide](./SETUP.md) | Complete setup instructions |
+| [Sample Questions](./docs/SampleQuestions.md) | Example prompts to try |
+| [Customization Guide](./docs/CustomizeSolution.md) | How to modify for your use case |
+| [Azure Account Setup](./docs/AzureAccountSetUp.md) | Azure prerequisites |
+| [Console Technical Docs](./src/console-sk/README.md) | Detailed technical documentation |
 
-<br/>   
+### 🗂️ Architecture Reference
+For those interested in the full web application this demo is based on, see [archived documentation](./docs/archived/).
 
-## Provide feedback
+### 🔒 Security Considerations
 
-Have questions, find a bug, or want to request a feature? [Submit a new issue](https://github.com/microsoft/Multi-Agent-Custom-Automation-Engine-Solution-Accelerator/issues) on this repo and we'll connect.
+This console demo uses:
+- **Azure Default Credentials** for local authentication
+- **Azure OpenAI Service** with built-in responsible AI features
+- **Local execution** - no web endpoints or external access
+
+For production implementations, consider:
+- Proper authentication and authorization
+- Network security and access controls  
+- Audit logging and monitoring
+- Data encryption and privacy controls
 
 <br/>
-
-## Responsible AI Transparency FAQ 
-Please refer to [Transparency FAQ](./docs/TRANSPARENCY_FAQ.md) for responsible AI transparency details of this solution accelerator.
-
-<br/>
-
-## Disclaimers
-
-To the extent that the Software includes components or code used in or derived from Microsoft products or services, including without limitation Microsoft Azure Services (collectively, "Microsoft Products and Services"), you must also comply with the Product Terms applicable to such Microsoft Products and Services. You acknowledge and agree that the license governing the Software does not grant you a license or other right to use Microsoft Products and Services. Nothing in the license or this ReadMe file will serve to supersede, amend, terminate or modify any terms in the Product Terms for any Microsoft Products and Services. 
-
-You must also comply with all domestic and international export laws and regulations that apply to the Software, which include restrictions on destinations, end users, and end use. For further information on export restrictions, visit https://aka.ms/exporting. 
-
-You acknowledge that the Software and Microsoft Products and Services (1) are not designed, intended or made available as a medical device(s), and (2) are not designed or intended to be a substitute for professional medical advice, diagnosis, treatment, or judgment and should not be used to replace or as a substitute for professional medical advice, diagnosis, treatment, or judgment. Customer is solely responsible for displaying and/or obtaining appropriate consents, warnings, disclaimers, and acknowledgements to end users of Customer's implementation of the Online Services. 
-
-You acknowledge the Software is not subject to SOC 1 and SOC 2 compliance audits. No Microsoft technology, nor any of its component technologies, including the Software, is intended or made available as a substitute for the professional advice, opinion, or judgment of a certified financial services professional. Do not use the Software to replace, substitute, or provide professional financial advice or judgment.  
-
-BY ACCESSING OR USING THE SOFTWARE, YOU ACKNOWLEDGE THAT THE SOFTWARE IS NOT DESIGNED OR INTENDED TO SUPPORT ANY USE IN WHICH A SERVICE INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE COULD RESULT IN THE DEATH OR SERIOUS BODILY INJURY OF ANY PERSON OR IN PHYSICAL OR ENVIRONMENTAL DAMAGE (COLLECTIVELY, "HIGH-RISK USE"), AND THAT YOU WILL ENSURE THAT, IN THE EVENT OF ANY INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE, THE SAFETY OF PEOPLE, PROPERTY, AND THE ENVIRONMENT ARE NOT REDUCED BELOW A LEVEL THAT IS REASONABLY, APPROPRIATE, AND LEGAL, WHETHER IN GENERAL OR IN A SPECIFIC INDUSTRY. BY ACCESSING THE SOFTWARE, YOU FURTHER ACKNOWLEDGE THAT YOUR HIGH-RISK USE OF THE SOFTWARE IS AT YOUR OWN RISK. 
