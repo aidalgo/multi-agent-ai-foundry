@@ -15,6 +15,7 @@ from models import (
     InputTask,
     StepStatus,
 )
+from semantic_kernel.functions.kernel_arguments import KernelArguments
 from utils import ConsoleAgentFactory, ConsoleUtils
 
 logger = logging.getLogger(__name__)
@@ -109,37 +110,80 @@ class ConsoleMACAE:
             plan_response = await self.planner_agent.handle_input_task(input_task)
             
             if plan_response:
-                print("✅ Plan created successfully!")
-                
                 # Get the created plan
                 self.current_plan = await self.memory_store.get_latest_plan(
                     self.session_id, self.user_id
                 )
                 
-                if self.current_plan:
-                    print(f"\n📋 Plan: {self.current_plan.initial_goal}")
-                    print(f"Status: {self.current_plan.overall_status}")
+                # Handle clarification requests in a loop until all information is collected
+                rounds = 0
+                while self.current_plan and self.current_plan.human_clarification_request:
+                    rounds += 1
                     
-                    # Get steps
-                    steps = await self.memory_store.get_steps_for_plan(self.current_plan.id)
-                    print(f"Steps ({len(steps)}):")
-                    
-                    for i, step in enumerate(steps, 1):
-                        agent_name = ConsoleUtils.format_agent_name(step.agent.value)
-                        truncated_action = ConsoleUtils.truncate_text(step.action, 80)
-                        print(f"  {i}. {agent_name}: {truncated_action}")
-                    
-                    # Ask for approval to execute
-                    print("\n" + "="*50)
-                    approve = input("Do you want to execute this plan? (y/n): ").lower()
-                    
-                    if approve in ['y', 'yes']:
-                        # Now use GroupChatManager to handle the execution
-                        await self.start_group_chat_execution()
+                    print("\n" + "=" * 50)
+                    if rounds == 1:
+                        print("📋 INFORMATION NEEDED")
                     else:
-                        print("Plan execution cancelled.")
+                        print(f"📋 ADDITIONAL INFORMATION NEEDED (Round {rounds})")
+                    print("=" * 50)
+                    
+                    # Print the questions in a formatted way if they look like a numbered list
+                    clarification_request = self.current_plan.human_clarification_request
+                    if any(line.strip().startswith(str(i)+".") for i in range(1, 10) for line in clarification_request.split("\n")):
+                        print(clarification_request)
+                    else:
+                        print(f"❓ {clarification_request}")
+                    
+                    print("-" * 50)
+                    clarification = input("Your response: ").strip()
+                    
+                    if not clarification:
+                        print("⚠️ No information provided. Please try again.")
+                        continue
+                    
+                    # Send the clarification back to the planner
+                    print("\n🔄 Analyzing your information...")
+                    result = await self.planner_agent.handle_plan_clarification(
+                        KernelArguments(
+                            session_id=self.session_id,
+                            human_clarification=clarification
+                        )
+                    )
+                    
+                    # Get the updated plan
+                    self.current_plan = await self.memory_store.get_latest_plan(
+                        self.session_id, self.user_id
+                    )
+                    
+                    # If result indicates we need more clarification, continue the loop
+                    if "Additional clarification requested" in result:
+                        print("🔍 Processing your answers...")
+                    else:
+                        print("\n✅ All needed information collected!")
+                        break
+                
+                print(f"\n✅ Plan created successfully!")
+                print(f"\n📋 Plan: {self.current_plan.initial_goal}")
+                print(f"Status: {self.current_plan.overall_status}")
+                
+                # Get steps
+                steps = await self.memory_store.get_steps_for_plan(self.current_plan.id)
+                print(f"Steps ({len(steps)}):")
+                
+                for i, step in enumerate(steps, 1):
+                    agent_name = ConsoleUtils.format_agent_name(step.agent.value)
+                    truncated_action = ConsoleUtils.truncate_text(step.action, 80)
+                    print(f"  {i}. {agent_name}: {truncated_action}")
+                
+                # Ask for approval to execute
+                print("\n" + "="*50)
+                approve = input("Do you want to execute this plan? (y/n): ").lower()
+                
+                if approve in ['y', 'yes']:
+                    # Now use GroupChatManager to handle the execution
+                    await self.start_group_chat_execution()
                 else:
-                    print("❌ Could not retrieve created plan.")
+                    print("Plan execution cancelled.")
             else:
                 print("❌ Failed to create plan.")
                 

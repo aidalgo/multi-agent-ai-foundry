@@ -22,6 +22,26 @@ class HrTools:
     # Define HR tools (functions)
     formatting_instructions = "Instructions: returning the output of this function call verbatim to the user in markdown. Then write AGENT SUMMARY: and then include a summary of what you did."
     agent_name = AgentType.HR.value
+    
+    # Parameter descriptions for better tool documentation
+    _param_descriptions = {
+        "employee_name": "The full name of the employee (e.g., 'John Smith')",
+        "date": "Date in YYYY-MM-DD format (e.g., '2024-01-15')",
+        "program_name": "The name of the training program",
+        "field": "The field name to update in employee record (e.g., 'phone', 'address', 'emergency_contact')",
+        "value": "The new value for the field being updated",
+        "policy_name": "The name or identifier of the company policy",
+        "policy_content": "The content or description of the policy",
+        "claim_amount": "The expense claim amount in dollars (positive number)",
+        "subject": "The subject line of the company announcement",
+        "content": "The content/message of the announcement",
+        "activity_name": "The name of the team building activity",
+        "new_department": "The name of the department the employee is transferring to",
+        "hours": "Number of overtime hours worked (positive number)",
+        "amount": "The bonus amount in dollars (positive number)",
+        "suggestion": "The employee's suggestion or feedback",
+        "emailaddress": "The email address to send to (e.g., 'user@company.com')"
+    }
 
     @staticmethod
     @kernel_function(description="Schedule an orientation session for a new employee.")
@@ -478,9 +498,12 @@ class HrTools:
                                 param_type = "string"
 
                     # Create parameter description
-                    # param_desc = param_name.replace("_", " ")
+                    param_desc = cls._param_descriptions.get(
+                        param_name, 
+                        param_name.replace("_", " ").title()
+                    )
                     args_dict[param_name] = {
-                        "description": param_name,
+                        "description": param_desc,
                         "title": param_name.replace("_", " ").title(),
                         "type": param_type,
                     }

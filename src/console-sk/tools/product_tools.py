@@ -25,6 +25,32 @@ class ProductTools:
     """Define Product Agent functions (tools)"""
 
     agent_name = AgentType.PRODUCT.value
+    
+    # Parameter descriptions for better tool documentation
+    _param_descriptions = {
+        "new_extras_pack_name": "The name of the new extras pack or product to add",
+        "start_date": "The start date for the service in YYYY-MM-DD format",
+        "product_name": "The name of the product",
+        "quantity": "The quantity amount (positive integer)",
+        "price": "The price amount in dollars (positive number)",
+        "launch_date": "The product launch date in YYYY-MM-DD format",
+        "time_period": "The time period for analysis (e.g., 'last month', 'Q1 2024', 'last 6 months')",
+        "recall_reason": "The reason for the product recall",
+        "report_type": "The type of report to generate (e.g., 'sales', 'performance', 'quality')",
+        "supplier_name": "The name of the supplier company",
+        "tracking_number": "The shipment tracking number",
+        "reorder_level": "The inventory reorder level (positive integer)",
+        "description": "The product description or details",
+        "return_reason": "The reason for the product return",
+        "survey_details": "Details about the product survey",
+        "listing_details": "Details about the product listing",
+        "availability": "Whether the product is available (true/false)",
+        "category": "The product category name",
+        "bundle_name": "The name of the product bundle",
+        "product_list": "List of products in the bundle",
+        "pricing_strategy": "The pricing strategy to apply (e.g., 'competitive', 'premium', 'discount')",
+        "label_details": "Details about the product labels"
+    }
 
     @staticmethod
     @kernel_function(
@@ -683,9 +709,12 @@ class ProductTools:
                                 param_type = "string"
 
                     # Create parameter description
-                    # param_desc = param_name.replace("_", " ")
+                    param_desc = cls._param_descriptions.get(
+                        param_name, 
+                        param_name.replace("_", " ").title()
+                    )
                     args_dict[param_name] = {
-                        "description": param_name,
+                        "description": param_desc,
                         "title": param_name.replace("_", " ").title(),
                         "type": param_type,
                     }

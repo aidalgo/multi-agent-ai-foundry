@@ -11,6 +11,11 @@ class GenericTools:
     """Define Generic Agent functions (tools)"""
 
     agent_name = AgentType.GENERIC.value
+    
+    # Parameter descriptions for better tool documentation
+    _param_descriptions = {
+        # Add descriptions as needed for future generic tools
+    }
 
     @staticmethod
     @kernel_function(
@@ -112,9 +117,12 @@ class GenericTools:
                                 param_type = "string"
 
                     # Create parameter description
-                    # param_desc = param_name.replace("_", " ")
+                    param_desc = cls._param_descriptions.get(
+                        param_name, 
+                        param_name.replace("_", " ").title()
+                    )
                     args_dict[param_name] = {
-                        "description": param_name,
+                        "description": param_desc,
                         "title": param_name.replace("_", " ").title(),
                         "type": param_type,
                     }

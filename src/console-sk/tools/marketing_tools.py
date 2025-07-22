@@ -12,6 +12,39 @@ class MarketingTools:
     """A class that provides various marketing tools and functions."""
 
     agent_name = AgentType.MARKETING.value
+    
+    # Parameter descriptions for better tool documentation
+    _param_descriptions = {
+        "campaign_name": "The name of the marketing campaign",
+        "target_audience": "The target audience description (e.g., 'young professionals aged 25-35')",
+        "budget": "The campaign budget amount in dollars (positive number)",
+        "industry": "The industry name or sector to analyze",
+        "platforms": "List of social media platforms (e.g., ['Facebook', 'Twitter', 'Instagram'])",
+        "total_budget": "The total budget amount in dollars (positive number)",
+        "survey_topic": "The topic or subject of the customer survey",
+        "target_group": "The target group for the survey (e.g., 'existing customers', 'millennials')",
+        "competitor_name": "The name of the competitor company to analyze",
+        "email_list_size": "The number of contacts in the email list (positive integer)",
+        "brand_name": "The name of the brand",
+        "month": "The month for the content calendar (e.g., 'January', 'February')",
+        "page_name": "The name of the website page to update",
+        "product_name": "The name of the product being launched",
+        "launch_date": "The launch date in YYYY-MM-DD format",
+        "key_information_for_press_release": "Key information and details for the press release",
+        "research_topic": "The topic or subject for market research",
+        "feedback_details": "Details of the customer feedback received",
+        "platform": "The social media platform name (e.g., 'Facebook', 'Twitter', 'LinkedIn')",
+        "account_name": "The name of the social media account",
+        "content_title": "The title of the content being created",
+        "study_topic": "The topic for the focus group study",
+        "participants": "The number of participants (positive integer)",
+        "guidelines": "The brand guidelines content or description",
+        "segment": "The customer segment to analyze (e.g., 'premium customers', 'new users')",
+        "members": "The number of loyalty program members (positive integer)",
+        "strategy_name": "The name of the content strategy",
+        "webinar_title": "The title of the webinar",
+        "date": "Date in YYYY-MM-DD format (e.g., '2024-01-15')"
+    }
 
     @staticmethod
     @kernel_function(description="Create a new marketing campaign.")
@@ -342,9 +375,12 @@ class MarketingTools:
                                 param_type = "string"
 
                     # Create parameter description
-                    # param_desc = param_name.replace("_", " ")
+                    param_desc = cls._param_descriptions.get(
+                        param_name, 
+                        param_name.replace("_", " ").title()
+                    )
                     args_dict[param_name] = {
-                        "description": param_name,
+                        "description": param_desc,
                         "title": param_name.replace("_", " ").title(),
                         "type": param_type,
                     }

@@ -161,36 +161,8 @@ def show_all_actions():
 
 
 def collect_missing_info(task_description: str) -> str:
-    """Collect missing information from user based on task type."""
-    task_lower = task_description.lower()
-    
-    # Common patterns that might need additional info
-    if "onboard" in task_lower or "new employee" in task_lower:
-        if not any(name in task_lower for name in ["john", "jane", "smith", "doe", "johnson", "williams", "brown", "davis", "miller", "wilson", "moore", "taylor", "anderson", "thomas", "jackson", "white", "harris", "martin", "thompson", "garcia", "martinez", "robinson", "clark", "rodriguez", "lewis", "lee", "walker", "hall", "allen", "young", "hernandez", "king", "wright", "lopez", "hill", "scott", "green", "adams", "baker", "gonzalez", "nelson", "carter", "mitchell", "perez", "roberts", "turner", "phillips", "campbell", "parker", "evans", "edwards", "collins", "stewart", "sanchez", "morris", "rogers", "reed", "cook", "morgan", "bell", "murphy", "bailey", "rivera", "cooper", "richardson", "cox", "howard", "ward", "torres", "peterson", "gray", "ramirez", "james", "watson", "brooks", "kelly", "sanders", "price", "bennett", "wood", "barnes", "ross", "henderson", "coleman", "jenkins", "perry", "powell", "long", "patterson", "hughes", "flores", "washington", "butler", "simmons", "foster", "gonzales", "bryant", "alexander", "russell", "griffin", "diaz", "hayes"]):
-            print("\n📝 I need some additional information:")
-            employee_name = input("Employee name: ").strip()
-            if employee_name:
-                return f"{task_description} for {employee_name}"
-    
-    elif "create" in task_lower and "campaign" in task_lower:
-        if not any(prod in task_lower for prod in ["product", "service", "launch", "promotion", "sale", "brand", "holiday", "summer", "winter", "spring", "fall"]):
-            print("\n📝 I need some additional information:")
-            campaign_type = input("Campaign type/focus (e.g., 'product launch', 'holiday promotion'): ").strip()
-            if campaign_type:
-                return f"{task_description} for {campaign_type}"
-    
-    elif "order" in task_lower and not any(item in task_lower for item in ["laptop", "monitor", "keyboard", "mouse", "software", "license", "hardware", "equipment"]):
-        print("\n📝 I need some additional information:")
-        item_type = input("What items to order (e.g., 'laptop', 'software licenses'): ").strip()
-        if item_type:
-            return f"{task_description} - {item_type}"
-    
-    elif "reset password" in task_lower and not any(user in task_lower for user in ["@", "."]):
-        print("\n📝 I need some additional information:")
-        username = input("Username or email: ").strip()
-        if username:
-            return f"{task_description} for {username}"
-    
+    """Pass through function that lets the agent decide what information it needs."""
+    # No pre-processing - let the agent handle information gathering dynamically
     return task_description
 
 
@@ -232,15 +204,18 @@ async def main():
                     await console_app.show_status()
                     continue
                 
-                # Collect additional information if needed
-                enhanced_task = collect_missing_info(user_input)
+                # Let the agent dynamically gather all required information
+                # No pre-processing of the task
+                task = user_input
                 
                 # Process the task
-                print(f"\n🔄 Processing: {enhanced_task}")
+                print(f"\n🔄 Processing: {task}")
                 print("-" * 60)
                 
                 # Process the user input as a task
-                await console_app.process_task(enhanced_task)
+                # The planner agent will identify and request all necessary information
+                # through its dynamic parameter analysis and clarification requests
+                await console_app.process_task(task)
                 
             except KeyboardInterrupt:
                 print("\n👋 Goodbye!")

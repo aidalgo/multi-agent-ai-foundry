@@ -10,6 +10,29 @@ class TechSupportTools:
     # Define Tech Support tools (functions)
     formatting_instructions = "Instructions: returning the output of this function call verbatim to the user in markdown. Then write AGENT SUMMARY: and then include a summary of what you did."
     agent_name = AgentType.TECH_SUPPORT.value
+    
+    # Parameter descriptions for better tool documentation
+    _param_descriptions = {
+        "employee_name": "The full name of the employee (e.g., 'John Smith')",
+        "email_address": "The employee's email address (e.g., 'john.smith@company.com')",
+        "laptop_model": "The model/brand of the laptop (e.g., 'Dell Latitude 7420', 'MacBook Pro 14-inch')",
+        "issue_description": "A detailed description of the issue or problem being reported",
+        "software_name": "The name of the software application (e.g., 'Microsoft Office', 'Adobe Photoshop')",
+        "incident_details": "Detailed information about the cybersecurity incident including what happened and when",
+        "equipment_details": "Specifications and details about the equipment or hardware",
+        "project_name": "The name or identifier of the project",
+        "campaign_name": "The name or identifier of the marketing campaign",
+        "product_name": "The name or identifier of the product",
+        "policy_name": "The name or identifier of the IT policy",
+        "service_name": "The name of the cloud service (e.g., 'AWS S3', 'Azure Storage')",
+        "server_name": "The name or identifier of the server",
+        "database_name": "The name of the database",
+        "tool_name": "The name of the tool or software for training",
+        "printer_model": "The model/brand of the printer (e.g., 'HP LaserJet Pro', 'Canon Pixma')",
+        "signature": "The email signature text/content to be set up",
+        "device_model": "The model/brand of the mobile device (e.g., 'iPhone 13', 'Samsung Galaxy S21')",
+        "license_count": "The number of software licenses to manage (positive integer)"
+    }
 
     @staticmethod
     @kernel_function(
@@ -360,9 +383,12 @@ class TechSupportTools:
                                 param_type = "string"
 
                     # Create parameter description
-                    # param_desc = param_name.replace("_", " ")
+                    param_desc = cls._param_descriptions.get(
+                        param_name, 
+                        param_name.replace("_", " ").title()
+                    )
                     args_dict[param_name] = {
-                        "description": param_name,
+                        "description": param_desc,
                         "title": param_name.replace("_", " ").title(),
                         "type": param_type,
                     }

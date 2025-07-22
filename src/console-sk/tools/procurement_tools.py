@@ -11,6 +11,37 @@ class ProcurementTools:
 
     formatting_instructions = "Instructions: returning the output of this function call verbatim to the user in markdown. Then write AGENT SUMMARY: and then include a summary of what you did."
     agent_name = AgentType.PROCUREMENT.value
+    
+    # Parameter descriptions for better tool documentation
+    _param_descriptions = {
+        "item_name": "The name of the item/product to order or reference",
+        "quantity": "The number of items (positive integer)",
+        "po_number": "The purchase order number",
+        "invoice_number": "The invoice number for processing",
+        "order_number": "The order tracking number",
+        "vendor_name": "The name of the vendor/supplier company",
+        "action": "The action to take with the vendor relationship (e.g., 'review', 'renew contract', 'evaluate')",
+        "policy_name": "The name of the procurement policy",
+        "policy_content": "The content or description of the policy",
+        "report_type": "The type of procurement report to generate (e.g., 'monthly', 'quarterly', 'expense summary')",
+        "supplier_name": "The name of the supplier company",
+        "reason": "The reason for the return or action",
+        "amount": "The payment amount in dollars (positive number)",
+        "asset_name": "The name of the asset/equipment",
+        "asset_details": "Details about the asset including specifications, location, etc.",
+        "agreement_details": "Details about the leasing agreement",
+        "category": "The product or service category for market research",
+        "equipment_name": "The name of the equipment requiring maintenance",
+        "maintenance_date": "The scheduled maintenance date in YYYY-MM-DD format",
+        "budget_id": "The identifier for the budget to approve",
+        "warranty_period": "The warranty period (e.g., '2 years', '12 months')",
+        "shipment_id": "The shipment tracking identifier",
+        "discount_percentage": "The discount percentage to negotiate (e.g., 15.5 for 15.5%)",
+        "vendor_details": "Details about the vendor including contact info, capabilities, etc.",
+        "session_name": "The name of the training session",
+        "date": "Date in YYYY-MM-DD format (e.g., '2024-01-15')",
+        "rating": "The vendor rating score (typically 1-5 or 1-10)"
+    }
 
     # Define Procurement tools (functions)
     @staticmethod
@@ -618,9 +649,12 @@ class ProcurementTools:
                                 param_type = "string"
 
                     # Create parameter description
-                    # param_desc = param_name.replace("_", " ")
+                    param_desc = cls._param_descriptions.get(
+                        param_name, 
+                        param_name.replace("_", " ").title()
+                    )
                     args_dict[param_name] = {
-                        "description": param_name,
+                        "description": param_desc,
                         "title": param_name.replace("_", " ").title(),
                         "type": param_type,
                     }

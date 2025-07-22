@@ -242,6 +242,14 @@ class ConsoleMemoryContext:
         """Get all steps for a plan (alias for get_steps_for_plan)."""
         return await self.get_steps_for_plan(plan_id)
 
+    async def delete_step(self, step_id: str, session_id: str = None) -> bool:
+        """Delete a step by ID."""
+        if step_id in self._steps:
+            del self._steps[step_id]
+            logger.info(f"Deleted step: {step_id}")
+            return True
+        return False
+    
     async def get_stats(self) -> Dict[str, int]:
         """Get statistics about stored data."""
         return {
