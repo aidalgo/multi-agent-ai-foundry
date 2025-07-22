@@ -7,9 +7,6 @@ import sys
 import os
 from pathlib import Path
 
-# Add the backend directory to Python path
-sys.path.insert(0, str(Path(__file__).parent / "backend"))
-
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
@@ -30,28 +27,28 @@ def test_imports():
         return False
     
     try:
-        from backend.app_config import AppConfig
+        from config import AppConfig
         print("✅ App Config import successful")
     except ImportError as e:
         print(f"❌ App Config import failed: {e}")
         return False
     
     try:
-        from backend.models.messages_kernel import AgentType
+        from models import AgentType
         print("✅ Models import successful")
     except ImportError as e:
         print(f"❌ Models import failed: {e}")
         return False
     
     try:
-        from console_memory import ConsoleMemoryContext
+        from memory import ConsoleMemoryContext
         print("✅ Console Memory import successful")
     except ImportError as e:
         print(f"❌ Console Memory import failed: {e}")
         return False
     
     try:
-        from utils_console import ConsoleAgentFactory
+        from utils import ConsoleAgentFactory
         print("✅ Console Utils import successful")
     except ImportError as e:
         print(f"❌ Console Utils import failed: {e}")

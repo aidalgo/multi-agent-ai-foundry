@@ -1,10 +1,10 @@
-# Multi-Agent Custom Automation Engine Solution Accelerator
+# Multi-Agent Custom Automation Engine - Console Version
 
-Welcome to the *Multi-Agent Custom Automation Engine* solution accelerator, designed to help businesses leverage AI agents for automating complex organizational tasks. This accelerator provides a foundation for building AI-driven orchestration systems that can coordinate multiple specialized agents to accomplish various business processes.
+Welcome to the *Multi-Agent Custom Automation Engine* console application, designed to help businesses leverage AI agents for automating complex organizational tasks through a command-line interface. This console version provides a foundation for building AI-driven orchestration systems that can coordinate multiple specialized agents to accomplish various business processes.
 
 When dealing with complex organizational tasks, users often face significant challenges, including coordinating across multiple departments, maintaining consistency in processes, and ensuring efficient resource utilization.
 
-The Multi-Agent Custom Automation Engine solution accelerator allows users to specify tasks and have them automatically processed by a group of AI agents, each specialized in different aspects of the business. This automation not only saves time but also ensures accuracy and consistency in task execution.
+The Multi-Agent Custom Automation Engine console application allows users to specify tasks through an interactive console and have them automatically processed by a group of AI agents, each specialized in different aspects of the business. This automation not only saves time but also ensures accuracy and consistency in task execution.
 
 <br/>
 
@@ -19,7 +19,7 @@ The Multi-Agent Custom Automation Engine solution accelerator allows users to sp
 Solution overview
 </h2>
 
-The solution leverages Azure OpenAI Service, Azure Container Apps, Azure Cosmos DB, and Azure Container Registry to create an intelligent automation pipeline. It uses a multi-agent approach where specialized AI agents work together to plan, execute, and validate tasks based on user input.
+The solution leverages Azure OpenAI Service and Azure AI Foundry to create an intelligent automation pipeline through a console interface. It uses a multi-agent approach where specialized AI agents work together to plan, execute, and validate tasks based on user input through an interactive command-line interface.
 
 ### Solution architecture
 |![image](./docs/images/readme/architecture.png)|
@@ -70,18 +70,15 @@ Quick deploy
 </h2>
 
 ### How to install or deploy
-Follow the quick deploy steps on the deployment guide to deploy this solution to your own Azure subscription.
+Follow the console setup instructions to run this application locally.
 
-[Click here to launch the deployment guide](./docs/DeploymentGuide.md)
+[🚀 **Get Started - Setup Guide**](./SETUP.md)
 <br/><br/>
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/Multi-Agent-Custom-Automation-Engine-Solution-Accelerator) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/Multi-Agent-Custom-Automation-Engine-Solution-Accelerator) |
-|---|---|
- 
-<br/>
+<br/><br/>
 
-> ⚠️ **Important: Check Azure OpenAI Quota Availability**
- <br/>To ensure sufficient quota is available in your subscription, please follow [quota check instructions guide](./docs/quota_check.md) before you deploy the solution.
+> ℹ️ **Note: Azure OpenAI Quota**
+ <br/>Make sure you have sufficient Azure OpenAI quota in your subscription. You can check your quota in the Azure portal under your Azure OpenAI resource.
 
 <br/>
 
@@ -89,24 +86,21 @@ Follow the quick deploy steps on the deployment guide to deploy this solution to
 
 To deploy this solution accelerator, ensure you have access to an [Azure subscription](https://azure.microsoft.com/free/) with the necessary permissions to create **resource groups and resources**. Follow the steps in [Azure Account Set Up](./docs/AzureAccountSetUp.md).
 
-Check the [Azure Products by Region](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) page and select a **region** where the following services are available: Azure OpenAI Service, Azure AI Search, and Azure Semantic Search.
+Check the [Azure Products by Region](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/table) page and select a **region** where the following services are available: Azure OpenAI Service.
 
 Here are some example regions where the services are available: East US, East US2, Japan East, UK South, Sweden Central.
 
-Pricing varies per region and usage, so it isn't possible to predict exact costs for your usage. The majority of the Azure resources used in this infrastructure are on usage-based pricing tiers. However, Azure Container Registry has a fixed cost per registry per day.
+Pricing varies per region and usage, so it isn't possible to predict exact costs for your usage. The console application uses Azure OpenAI Service on a usage-based pricing tier.
 
-Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator) to calculate the cost of this solution in your subscription. [Review a sample pricing sheet for the architecture](https://azure.com/e/86d0eefbe4dd4a23981c1d3d4f6fe7ed).
+Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator) to calculate the cost of this solution in your subscription.
 | Product | Description | Cost |
 |---|---|---|
 | [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/) | Powers the AI agents for task automation | [Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) |
-| [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/) | Hosts the web application frontend | [Pricing](https://azure.microsoft.com/pricing/details/container-apps/) |
-| [Azure Cosmos DB](https://learn.microsoft.com/azure/cosmos-db/) | Stores metadata and processing results | [Pricing](https://azure.microsoft.com/pricing/details/cosmos-db/) |
-| [Azure Container Registry](https://learn.microsoft.com/azure/container-registry/) | Stores container images for deployment | [Pricing](https://azure.microsoft.com/pricing/details/container-registry/) |
+| [Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/) | Provides the project infrastructure for AI agents | [Pricing](https://azure.microsoft.com/pricing/details/machine-learning/) |
 
 <br/>
 
->⚠️ **Important:** To avoid unnecessary costs, remember to take down your app if it's no longer in use,
-either by deleting the resource group in the Portal or running `azd down`.
+>⚠️ **Important:** The console application runs locally and does not require Azure resource cleanup. However, you will incur costs for Azure OpenAI Service usage during operation.
 
 <br /><br />
 <h2><img src="./docs/images/readme/business-scenario.png" width="48" />

@@ -1,53 +1,111 @@
-# Next Steps after `azd init`
+# Next Steps - Console Multi-Agent System
 
-## Table of Contents
+## Getting Started
 
-1. [Next Steps](#next-steps)
-2. [What was added](#what-was-added)
-3. [Billing](#billing)
-4. [Troubleshooting](#troubleshooting)
+### 1. **Complete Setup**
+If you haven't already, follow the [Setup Guide](./SETUP.md) to configure your environment and Azure resources.
 
-## Next Steps
-
-### Provision infrastructure and deploy application code
-
-Run `azd up` to provision your infrastructure and deploy to Azure (or run `azd provision` then `azd deploy` to accomplish the tasks separately). Visit the service endpoints listed to see your application up-and-running!
-
-To troubleshoot any issues, see [troubleshooting](#troubleshooting).
-
-### Configure environment variables for running services
-
-Environment variables can be configured by modifying the `env` settings in [resources.bicep](./infra/old/resources.bicep).
-To define a secret, add the variable as a `secretRef` pointing to a `secrets` entry or a stored KeyVault secret.
-
-### Configure CI/CD pipeline
-
-Run `azd pipeline config` to configure the deployment pipeline to connect securely to Azure. 
-
-- Deploying with `GitHub Actions`: Select `GitHub` when prompted for a provider. If your project lacks the `azure-dev.yml` file, accept the prompt to add it and proceed with pipeline configuration.
-
-- Deploying with `Azure DevOps Pipeline`: Select `Azure DevOps` when prompted for a provider. If your project lacks the `azure-dev.yml` file, accept the prompt to add it and proceed with pipeline configuration.
-
-## What was added
-
-### Infrastructure configuration
-
-To describe the infrastructure and application, `azure.yaml` along with Infrastructure as Code files using Bicep were added with the following directory structure:
-
-```yaml
-- azure.yaml        # azd project configuration
-- infra/            # Infrastructure-as-code Bicep files
-  - main.bicep      # Subscription level resources
-  - resources.bicep # Primary resource group resources
-  - modules/        # Library modules
+### 2. **Run Your First Session**
+```bash
+cd src/console-sk
+python main.py
 ```
 
-The resources declared in [resources.bicep](./infra/old/resources.bicep) are provisioned when running `azd up` or `azd provision`.
-This includes:
+Try these sample prompts:
+- "Launch a new marketing campaign"
+- "Help me onboard a new employee"
+- "Plan a product launch strategy"
 
+### 3. **Explore Capabilities**
+Review [Sample Questions](./docs/SampleQuestions.md) to understand what the multi-agent system can do.
 
-- Azure Container App to host the 'backend' service.
-- Azure Container App to host the 'frontend' service.
+## Customization Options
+
+### **Add Your Own Agents**
+Follow the [Customization Guide](./docs/CustomizeSolution.md) to:
+- Create domain-specific agents
+- Add custom tools and functions
+- Integrate with your existing systems
+
+### **Environment Configuration**
+Customize settings in `src/console-sk/.env`:
+- Model selection and parameters
+- Custom API endpoints
+- Company-specific configurations
+
+### **Testing and Validation**
+Use the built-in test suite:
+```bash
+cd src/console-sk
+python test_setup.py
+```
+
+## Development Workflow
+
+### **Local Development**
+1. Make changes to agents, tools, or configuration
+2. Test with `python test_setup.py`
+3. Run interactive sessions with `python main.py`
+4. Iterate based on results
+
+### **Production Considerations**
+For production use, consider:
+- Implementing persistent storage (database)
+- Adding authentication and authorization
+- Creating web or API interfaces
+- Implementing monitoring and logging
+- Adding proper error handling and retry logic
+
+## Advanced Features
+
+### **Memory and Context**
+The console application maintains conversation history in memory. For persistent storage across sessions, consider integrating with Azure Cosmos DB or other databases.
+
+### **Multi-Agent Orchestration**
+Explore how agents coordinate:
+- Planner agent creates execution plans
+- Specialized agents handle specific tasks
+- Group chat manager orchestrates communication
+- Human-in-the-loop for validation
+
+### **Tool Integration**
+Add real business functions:
+- Replace stub functions with actual implementations
+- Integrate with your APIs and systems
+- Add validation and error handling
+
+## Troubleshooting
+
+### **Common Issues**
+- **Authentication**: Ensure `az login` is completed
+- **Quota**: Check Azure OpenAI quota availability
+- **Dependencies**: Verify all Python packages are installed
+- **Configuration**: Double-check environment variables
+
+### **Getting Help**
+1. Run `python test_setup.py` to diagnose issues
+2. Check console logs for specific error messages
+3. Review Azure portal for resource status
+4. Consult [Azure Account Setup](./docs/AzureAccountSetUp.md) for permission issues
+
+## Community and Support
+
+- **Issues**: Report bugs or request features via GitHub Issues
+- **Documentation**: Check `src/console-sk/README.md` for technical details
+- **Examples**: See `docs/SampleQuestions.md` for usage examples
+
+## Migration to Production
+
+When ready to deploy beyond console testing:
+
+1. **Architecture**: Design for your production scale and requirements
+2. **Storage**: Implement persistent data storage
+3. **Authentication**: Add proper user authentication
+4. **Interface**: Build web, mobile, or API interfaces
+5. **Monitoring**: Implement comprehensive logging and monitoring
+6. **Security**: Follow security best practices for your deployment
+
+The console version provides the foundation - extend it to meet your production needs!
 
 More information about [Bicep](https://aka.ms/bicep) language.
 
