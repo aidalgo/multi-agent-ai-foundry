@@ -186,18 +186,26 @@ AZURE_AI_AGENT_ENDPOINT=https://your-ai-project.cognitiveservices.azure.com/
 - **`memory.py`** - Memory store implementation
 - **`models.py`** - Data models and message types
 - **`utils.py`** - Utility functions and agent factory
-
 #### Agent System
-- **`agents/base_agent.py`** - Base agent class
-- **`agents/planner_agent.py`** - Task planning agent
-- **`agents/group_chat_manager.py`** - Plan execution coordinator
-- **`agents/hr_agent.py`** - HR-related tasks
-- **`agents/marketing_agent.py`** - Marketing tasks
-- **`agents/product_agent.py`** - Product management
-- **`agents/procurement_agent.py`** - Procurement tasks
-- **`agents/tech_support_agent.py`** - Technical support
-- **`agents/generic_agent.py`** - General task handling
-- **`agents/human_agent.py`** - Human interaction management
+
+**`ConsoleAgentFactory`**: Main factory for creating all agent types
+- `create_all_agents()`: Create and initialize all agents for a session
+- `_create_single_agent()`: Create an individual agent with type-specific parameters
+- `_setup_agent_coordination()`: Set up inter-agent communication
+- `get_available_agent_types()`: Return a list of available agent types
+- `get_agent_class_mapping()`: Return a mapping of agent types to classes
+
+**Agent Modules:**
+- **`agents/base_agent.py`** — Base agent class
+- **`agents/planner_agent.py`** — Task planning agent
+- **`agents/group_chat_manager.py`** — Plan execution coordinator
+- **`agents/hr_agent.py`** — HR-related tasks
+- **`agents/marketing_agent.py`** — Marketing tasks
+- **`agents/product_agent.py`** — Product management
+- **`agents/procurement_agent.py`** — Procurement tasks
+- **`agents/tech_support_agent.py`** — Technical support
+- **`agents/generic_agent.py`** — General task handling
+- **`agents/human_agent.py`** — Human interaction management
 
 #### Tools and Utilities
 - **`tools/`** - Specialized tool implementations for each agent
