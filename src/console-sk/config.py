@@ -8,7 +8,6 @@ import os
 from typing import Optional
 
 from azure.ai.projects.aio import AIProjectClient
-from azure.cosmos.aio import CosmosClient
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from semantic_kernel.kernel import Kernel
@@ -26,11 +25,6 @@ class AppConfig:
         self.AZURE_TENANT_ID = self._get_optional("AZURE_TENANT_ID")
         self.AZURE_CLIENT_ID = self._get_optional("AZURE_CLIENT_ID")
         self.AZURE_CLIENT_SECRET = self._get_optional("AZURE_CLIENT_SECRET")
-
-        # CosmosDB settings (optional for console app)
-        self.COSMOSDB_ENDPOINT = self._get_optional("COSMOSDB_ENDPOINT")
-        self.COSMOSDB_DATABASE = self._get_optional("COSMOSDB_DATABASE")
-        self.COSMOSDB_CONTAINER = self._get_optional("COSMOSDB_CONTAINER")
 
         # Azure OpenAI settings
         self.AZURE_OPENAI_DEPLOYMENT_NAME = self._get_required(
@@ -57,8 +51,6 @@ class AppConfig:
 
         # Cached clients and resources
         self._azure_credentials = None
-        self._cosmos_client = None
-        self._cosmos_database = None
         self._ai_project_client = None
 
     def _get_required(self, name: str, default: Optional[str] = None) -> str:
@@ -95,27 +87,6 @@ class AppConfig:
         except Exception as exc:
             logging.warning("Failed to create DefaultAzureCredential: %s", exc)
             return None
-
-    def get_cosmos_database_client(self):
-        """Get a Cosmos DB client for the configured database."""
-        try:
-            if self._cosmos_client is None:
-                self._cosmos_client = CosmosClient(
-                    self.COSMOSDB_ENDPOINT, credential=self.get_azure_credentials()
-                )
-
-            if self._cosmos_database is None:
-                self._cosmos_database = self._cosmos_client.get_database_client(
-                    self.COSMOSDB_DATABASE
-                )
-
-            return self._cosmos_database
-        except Exception as exc:
-            logging.error(
-                "Failed to create CosmosDB client: %s. CosmosDB is required for this application.",
-                exc,
-            )
-            raise
 
     def create_kernel(self):
         """Creates a new Semantic Kernel instance."""

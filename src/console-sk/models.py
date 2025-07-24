@@ -40,14 +40,14 @@ class DataType(str, Enum):
 
 class AgentType(str, Enum):
     """Enumeration of agent types."""
-    HUMAN = "Human_Agent"
-    HR = "Hr_Agent"
-    MARKETING = "Marketing_Agent"
-    PROCUREMENT = "Procurement_Agent"
-    PRODUCT = "Product_Agent"
-    GENERIC = "Generic_Agent"
-    TECH_SUPPORT = "Tech_Support_Agent"
-    GROUP_CHAT_MANAGER = "Group_Chat_Manager"
+    HUMAN = "Human_Agent1"
+    HR = "Hr_Agent1"
+    MARKETING = "Marketing_Agent1"
+    PROCUREMENT = "Procurement_Agent1"
+    PRODUCT = "Product_Agent1"
+    GENERIC = "Generic_Agent1"
+    TECH_SUPPORT = "Tech_Support_Agent1"
+    GROUP_CHAT_MANAGER = "Group_Chat_Manager1"
     PLANNER = "Planner_Agent"
 
 
